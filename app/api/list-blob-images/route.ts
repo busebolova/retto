@@ -1,12 +1,17 @@
 import { list } from "@vercel/blob"
 import { NextResponse } from "next/server"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
+  // Token yoksa boş liste döndür
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return NextResponse.json({ images: [] })
+  }
+
   try {
-    // Tüm blob dosyalarını listele (veya prefix ile filtreleme yapabilirsiniz)
     const { blobs } = await list()
 
-    // Sadece URL'leri ve metadata'yı döndür
     const images = blobs.map((blob) => ({
       url: blob.url,
       pathname: blob.pathname,
@@ -17,6 +22,6 @@ export async function GET() {
     return NextResponse.json({ images })
   } catch (error) {
     console.error("Blob görsellerini listelerken hata:", error)
-    return NextResponse.json({ error: "Görsel listesi alınamadı" }, { status: 500 })
+    return NextResponse.json({ images: [] }, { status: 200 })
   }
 }
