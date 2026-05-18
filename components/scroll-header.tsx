@@ -123,7 +123,7 @@ function ScrollHeader({ sticky = false }: ScrollHeaderProps) {
         onMouseEnter={e => { if (!menuOpen && !isMobile) (e.currentTarget as HTMLElement).style.opacity = "1" }}
         onMouseLeave={e => { if (!menuOpen && !isMobile) (e.currentTarget as HTMLElement).style.opacity = scrolled ? "0.6" : "1" }}
       >
-        {/* Logo */}
+        {/* Logo image */}
         <Link
           href="/"
           onClick={() => setMenuOpen(false)}

@@ -104,7 +104,7 @@ export default function HeroScrollAnimation() {
           }}
         />
 
-        {/* Arka plan "retto" yazısı — tam geniş, scroll ile kayboluyor */}
+        {/* Arka plan logo — tam ekran geniş, scroll ile kayboluyor */}
         <div
           ref={bgTextRef}
           style={{
@@ -116,16 +116,25 @@ export default function HeroScrollAnimation() {
             zIndex: 3,
             pointerEvents: "none",
             userSelect: "none",
-            textAlign: "center",
-            fontSize: "32vw",
-            fontWeight: 600,
-            letterSpacing: "-0.02em",
-            color: "rgba(0,0,0,0.07)",
-            lineHeight: 1,
-            fontFamily: "'Poppins', system-ui, sans-serif",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
           }}
         >
-          retto
+          <img
+            src="/images/retto-logo.png"
+            alt=""
+            aria-hidden="true"
+            style={{
+              width: "110vw",
+              maxWidth: "none",
+              height: "auto",
+              display: "block",
+              filter: "brightness(0)",
+              opacity: 0.08,
+            }}
+          />
         </div>
 
         {/* 3D model - tam ortada */}
@@ -145,7 +154,7 @@ export default function HeroScrollAnimation() {
           <ThreeModel />
         </div>
 
-        {/* Scroll sonrası beliren metin — sadece yazı, retto yok */}
+        {/* Scroll sonrası beliren metin */}
         <p
           ref={textRef}
           style={{
@@ -153,13 +162,13 @@ export default function HeroScrollAnimation() {
             top: "50%",
             left: 0,
             right: 0,
-            width: "20ch",
+            width: "min(22ch, 90vw)",
             textAlign: "center",
             marginInline: "auto",
-            fontSize: "clamp(1.4rem, 3.5vw, 3.5rem)",
+            fontSize: "clamp(2rem, 5.5vw, 5.5rem)",
             fontWeight: 400,
-            lineHeight: 1.2,
-            letterSpacing: "-0.02em",
+            lineHeight: 1.15,
+            letterSpacing: "-0.03em",
             opacity: 0,
             color: "#000000",
             zIndex: 10,

@@ -6,6 +6,7 @@ import { useInView } from "framer-motion"
 import dynamic from "next/dynamic"
 
 const HeroScrollAnimation = dynamic(() => import("./components/hero-scroll-animation"), { ssr: false })
+const Preloader = dynamic(() => import("./components/preloader"), { ssr: false })
 import ScrollHeader from "./components/scroll-header"
 import ModernServicesGrid from "./components/modern-services-grid"
 import ModernFounderSection from "./components/modern-founder-section"
@@ -40,6 +41,9 @@ export default function ScrollablePage() {
     <div
       className="bg-white text-black font-sans"
     >
+      {/* Sinematik Preloader */}
+      <Preloader />
+
       {/* Preload Critical Images */}
       <>
         <PreloadCriticalImages />
