@@ -117,30 +117,24 @@ export default function RootLayout({
   return (
     <html lang="tr" suppressHydrationWarning>
       <head>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;909&display=swap"
-        />
         <meta name="theme-color" content="#000000" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-        {/* Google Tag Manager (noscript) */}
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
-
-        {/* Preconnect to external domains */}
+        {/* Preconnect — render-blocking önlemek için stylesheet'ten önce */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://aifgfzhlyyimravy.public.blob.vercel-storage.com" />
 
-        {/* DNS Prefetch */}
-        <link rel="dns-prefetch" href="https://cdn.example.com" />
+        {/* Google Fonts — non-blocking */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"
+        />
+
+        {/* Kritik görselleri preload et */}
+        <link rel="preload" href="/images/retto-logo.png" as="image" />
 
         {/* Structured Data - Organization */}
         <script

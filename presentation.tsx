@@ -5,16 +5,19 @@ import React from "react"
 import { useInView } from "framer-motion"
 import dynamic from "next/dynamic"
 
-const HeroScrollAnimation = dynamic(() => import("./components/hero-scroll-animation"), { ssr: false })
-const Preloader = dynamic(() => import("./components/preloader"), { ssr: false })
+// Kritik — hemen yükle
 import ScrollHeader from "./components/scroll-header"
-import ModernServicesGrid from "./components/modern-services-grid"
-import ModernFounderSection from "./components/modern-founder-section"
 import PreloadCriticalImages from "./components/preload-critical-images"
-import ManualInstagramFeed from "./components/manual-instagram-feed"
-import YouTubePhoneMockup from "./components/youtube-phone-mockup"
-import Footer from "./components/footer"
-import MobileBottomNav from "./components/mobile-bottom-nav"
+
+// Ağır bileşenler — lazy load
+const Preloader = dynamic(() => import("./components/preloader"), { ssr: false })
+const HeroScrollAnimation = dynamic(() => import("./components/hero-scroll-animation"), { ssr: false })
+const YouTubePhoneMockup = dynamic(() => import("./components/youtube-phone-mockup"), { ssr: false })
+const ModernServicesGrid = dynamic(() => import("./components/modern-services-grid"), { ssr: false })
+const ModernFounderSection = dynamic(() => import("./components/modern-founder-section"), { ssr: false })
+const ManualInstagramFeed = dynamic(() => import("./components/manual-instagram-feed"), { ssr: false })
+const Footer = dynamic(() => import("./components/footer"), { ssr: false })
+const MobileBottomNav = dynamic(() => import("./components/mobile-bottom-nav"), { ssr: false })
 
 // Animated section component
 const AnimatedSection = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {

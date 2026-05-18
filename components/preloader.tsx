@@ -10,10 +10,10 @@ export default function Preloader() {
   const [done, setDone] = useState(false)
 
   useEffect(() => {
-    const t1 = setTimeout(() => setLogoReady(true), 120)
-    const t2 = setTimeout(() => setBreathe(true), 750)
-    const t3 = setTimeout(() => setExit(true), 1700)
-    const t4 = setTimeout(() => setDone(true), 3200)
+    const t1 = setTimeout(() => setLogoReady(true), 80)
+    const t2 = setTimeout(() => setBreathe(true), 400)
+    const t3 = setTimeout(() => setExit(true), 900)
+    const t4 = setTimeout(() => setDone(true), 1800)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
   }, [])
 
@@ -41,7 +41,7 @@ export default function Preloader() {
           exit
             ? {
                 clipPath: {
-                  duration: 1.2,
+                  duration: 0.7,
                   ease: [0.76, 0, 0.24, 1],
                 },
               }
