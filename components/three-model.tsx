@@ -94,7 +94,7 @@ export default function ThreeModel() {
 
       const loader = new GLTFLoader()
       loader.load(
-        "/8.gltf",
+        "/1.gltf",
         (gltf: any) => {
           if (destroyed) return
           model = gltf.scene
