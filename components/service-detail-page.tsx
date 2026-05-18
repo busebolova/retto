@@ -40,20 +40,20 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
 
   if (!service) {
     return (
-      <div style={{ backgroundColor: "#000000" }} className="text-white min-h-screen flex items-center justify-center">
+      <div style={{ backgroundColor: "#ffffff" }} className="text-black min-h-screen flex items-center justify-center">
         <div>Hizmet bilgileri yükleniyor...</div>
       </div>
     )
   }
 
   return (
-    <div style={{ backgroundColor: "#000000" }} className="text-white min-h-screen">
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative pt-32 pb-20 overflow-hidden">
+    <div style={{ backgroundColor: "#ffffff" }} className="text-black min-h-screen">
+      {/* Hero Section — beyaz */}
+      <section ref={heroRef} className="relative pt-32 pb-20 overflow-hidden" style={{ backgroundColor: "#fafaf8" }}>
         {/* Minimal Background Effects */}
         <div className="absolute inset-0">
-          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-gray-800/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/3 right-1/3 w-64 h-64 bg-gray-700/20 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-gray-200/40 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/3 right-1/3 w-64 h-64 bg-gray-100/40 rounded-full blur-3xl"></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -64,8 +64,8 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
               animate={isHeroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <h1 className="text-5xl md:text-6xl font-light tracking-tight mb-6 text-white">{service.title}</h1>
-              <p className="text-xl md:text-2xl text-gray-400 font-light max-w-3xl mx-auto leading-relaxed">
+              <h1 className="text-5xl md:text-6xl font-light tracking-tight mb-6" style={{ color: "#000" }}>{service.title}</h1>
+              <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto leading-relaxed" style={{ color: "#666" }}>
                 {service.subtitle}
               </p>
             </motion.div>
@@ -78,20 +78,20 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               <div className="text-center">
-                <div className="text-3xl font-light text-white mb-2">{service.deliveryTime}</div>
-                <div className="text-sm text-gray-500 uppercase tracking-wider">Teslimat</div>
+                <div className="text-3xl font-light mb-2" style={{ color: "#000" }}>{service.deliveryTime}</div>
+                <div className="text-sm uppercase tracking-wider" style={{ color: "#999" }}>Teslimat</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-light text-white mb-2">
+                <div className="text-3xl font-light mb-2" style={{ color: "#000" }}>
                   {service.id === "logo" ? "3+" : `${service.features?.length || 0}`}
                 </div>
-                <div className="text-sm text-gray-500 uppercase tracking-wider">
+                <div className="text-sm uppercase tracking-wider" style={{ color: "#999" }}>
                   {service.id === "logo" ? "Alternatif" : "Özellik"}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-light text-white mb-2">∞</div>
-                <div className="text-sm text-gray-500 uppercase tracking-wider">Revizyon</div>
+                <div className="text-3xl font-light mb-2" style={{ color: "#000" }}>∞</div>
+                <div className="text-sm uppercase tracking-wider" style={{ color: "#999" }}>Revizyon</div>
               </div>
             </motion.div>
           </div>
