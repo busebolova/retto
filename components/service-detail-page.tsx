@@ -1,10 +1,11 @@
 "use client"
 
-import { useRef, useState } from "react"
-import { motion, useInView } from "framer-motion"
-import { Play, Download } from "lucide-react"
-import Image from "next/image"
+import { useRef, useState, useEffect } from "react"
+import { motion, useScroll, useTransform, useSpring, useInView } from "framer-motion"
+import { Download } from "lucide-react"
 import Footer from "@/components/footer"
+import ScrollHeader from "@/components/scroll-header"
+import MobileBottomNav from "@/components/mobile-bottom-nav"
 
 interface ServiceFeature {
   title: string
@@ -29,483 +30,681 @@ interface ServiceData {
   examples?: string[]
 }
 
+// Parallax hook
+function useParallax(value: any, distance: number) {
+  return useTransform(value, [0, 1], [-distance, distance])
+}
+
+// Animated counter
+function AnimatedNumber({ value, suffix = "" }: { value: string; suffix?: string }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true })
+  return (
+    <motion.span
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {value}{suffix}
+    </motion.span>
+  )
+}
+
+// Section reveal
+function RevealSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, amount: 0.15 })
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 48 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 1, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 export default function ServiceDetailPage({ service }: { service: ServiceData }) {
-  const [selectedExample, setSelectedExample] = useState<string | null>(null)
-  const heroRef = useRef(null)
-  const contentRef = useRef(null)
-  const examplesRef = useRef(null)
-  const isHeroInView = useInView(heroRef, { once: true, amount: 0.3 })
-  const isContentInView = useInView(contentRef, { once: true, amount: 0.2 })
-  const isExamplesInView = useInView(examplesRef, { once: true, amount: 0.2 })
+  const containerRef = useRef<HTMLDivElement>(null)
+  const heroRef = useRef<HTMLDivElement>(null)
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  })
+
+  const { scrollYProgress: heroScroll } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  })
+
+  // Parallax transforms
+  const heroTitleY = useTransform(heroScroll, [0, 1], [0, -120])
+  const heroSubtitleY = useTransform(heroScroll, [0, 1], [0, -60])
+  const heroOpacity = useTransform(heroScroll, [0, 0.7], [1, 0])
+  const heroBgY = useTransform(heroScroll, [0, 1], [0, 80])
+
+  // Smooth spring
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 })
+
+  // Mouse parallax for hero
+  useEffect(() => {
+    const handleMouse = (e: MouseEvent) => {
+      setMousePos({
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2,
+      })
+    }
+    window.addEventListener("mousemove", handleMouse)
+    return () => window.removeEventListener("mousemove", handleMouse)
+  }, [])
 
   if (!service) {
     return (
-      <div style={{ backgroundColor: "#ffffff" }} className="text-black min-h-screen flex items-center justify-center">
-        <div>Hizmet bilgileri yükleniyor...</div>
+      <div style={{ backgroundColor: "#fafaf8", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontFamily: "'Poppins', sans-serif", color: "#000" }}>Yükleniyor...</div>
       </div>
     )
   }
 
   return (
-    <div style={{ backgroundColor: "#ffffff" }} className="text-black min-h-screen">
-      {/* Hero Section — beyaz */}
-      <section ref={heroRef} className="relative pt-32 pb-20 overflow-hidden" style={{ backgroundColor: "#fafaf8" }}>
-        {/* Minimal Background Effects */}
-        <div className="absolute inset-0">
-          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-gray-200/40 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/3 right-1/3 w-64 h-64 bg-gray-100/40 rounded-full blur-3xl"></div>
+    <div
+      ref={containerRef}
+      style={{
+        backgroundColor: "#fafaf8",
+        minHeight: "100vh",
+        fontFamily: "'Poppins', system-ui, sans-serif",
+        overflowX: "hidden",
+      }}
+    >
+      <ScrollHeader />
+
+      {/* ─── HERO ─── */}
+      <section
+        ref={heroRef}
+        style={{
+          position: "relative",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+          background: "#080808",
+        }}
+      >
+        {/* Parallax background texture */}
+        <motion.div
+          style={{
+            position: "absolute",
+            inset: "-20%",
+            backgroundImage: `radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%)`,
+            y: heroBgY,
+          }}
+        />
+
+        {/* Grain */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: 0.04,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            backgroundSize: "128px 128px",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Mouse parallax orb */}
+        <motion.div
+          style={{
+            position: "absolute",
+            width: "60vw",
+            height: "60vw",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)",
+            left: "50%",
+            top: "50%",
+            x: mousePos.x * 30 - 200,
+            y: mousePos.y * 20 - 200,
+            pointerEvents: "none",
+          }}
+          transition={{ type: "spring", stiffness: 60, damping: 20 }}
+        />
+
+        {/* Hero content */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            textAlign: "center",
+            padding: "0 clamp(24px, 6vw, 80px)",
+            maxWidth: "900px",
+          }}
+        >
+          {/* Service number */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              fontSize: "10px",
+              letterSpacing: "0.4em",
+              color: "rgba(255,255,255,0.25)",
+              textTransform: "uppercase",
+              marginBottom: "32px",
+              fontWeight: 300,
+            }}
+          >
+            Hizmet
+          </motion.p>
+
+          {/* Title with parallax */}
+          <motion.h1
+            style={{
+              fontSize: "clamp(3rem, 9vw, 9rem)",
+              fontWeight: 500,
+              color: "#ffffff",
+              lineHeight: 0.95,
+              letterSpacing: "-0.03em",
+              margin: "0 0 32px 0",
+              y: heroTitleY,
+              opacity: heroOpacity,
+            }}
+            initial={{ opacity: 0, y: 60, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {service.title}
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            style={{
+              fontSize: "clamp(14px, 1.8vw, 20px)",
+              color: "rgba(255,255,255,0.4)",
+              fontWeight: 300,
+              lineHeight: 1.6,
+              maxWidth: "560px",
+              margin: "0 auto",
+              y: heroSubtitleY,
+            }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {service.subtitle}
+          </motion.p>
+
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+            style={{
+              position: "absolute",
+              bottom: "-40vh",
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+              style={{
+                width: "1px",
+                height: "48px",
+                background: "linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)",
+              }}
+            />
+          </motion.div>
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-5xl mx-auto">
-            <motion.div
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isHeroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <h1 className="text-5xl md:text-6xl font-light tracking-tight mb-6" style={{ color: "#000" }}>{service.title}</h1>
-              <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto leading-relaxed" style={{ color: "#666" }}>
-                {service.subtitle}
-              </p>
-            </motion.div>
-
-            {/* Minimal Stats */}
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isHeroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <div className="text-center">
-                <div className="text-3xl font-light mb-2" style={{ color: "#000" }}>{service.deliveryTime}</div>
-                <div className="text-sm uppercase tracking-wider" style={{ color: "#999" }}>Teslimat</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-light mb-2" style={{ color: "#000" }}>
-                  {service.id === "logo" ? "3+" : `${service.features?.length || 0}`}
-                </div>
-                <div className="text-sm uppercase tracking-wider" style={{ color: "#999" }}>
-                  {service.id === "logo" ? "Alternatif" : "Özellik"}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-light mb-2" style={{ color: "#000" }}>∞</div>
-                <div className="text-sm uppercase tracking-wider" style={{ color: "#999" }}>Revizyon</div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
+        {/* Corner accents */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
+          style={{
+            position: "absolute",
+            top: "clamp(20px, 4vh, 48px)",
+            left: "clamp(20px, 4vw, 48px)",
+            width: "32px",
+            height: "32px",
+            borderTop: "1px solid rgba(255,255,255,0.1)",
+            borderLeft: "1px solid rgba(255,255,255,0.1)",
+          }}
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.9, duration: 0.8 }}
+          style={{
+            position: "absolute",
+            bottom: "clamp(20px, 4vh, 48px)",
+            right: "clamp(20px, 4vw, 48px)",
+            width: "32px",
+            height: "32px",
+            borderBottom: "1px solid rgba(255,255,255,0.1)",
+            borderRight: "1px solid rgba(255,255,255,0.1)",
+          }}
+        />
       </section>
 
-      {/* Features List */}
-      <section ref={contentRef} className="py-20" style={{ backgroundColor: "#ffffff" }}>
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              className="mb-12"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isContentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.8 }}
-            >
-              <p style={{ fontSize: "11px", letterSpacing: "0.3em", color: "#aaa", textTransform: "uppercase", marginBottom: "12px", fontWeight: 400 }}>
+      {/* ─── STATS BAR ─── */}
+      <section
+        style={{
+          background: "#ffffff",
+          borderBottom: "1px solid rgba(0,0,0,0.06)",
+        }}
+      >
+        <RevealSection>
+          <div
+            style={{
+              maxWidth: "1100px",
+              margin: "0 auto",
+              padding: "clamp(40px, 6vh, 72px) clamp(24px, 6vw, 80px)",
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "clamp(24px, 4vw, 64px)",
+            }}
+          >
+            {[
+              { value: service.deliveryTime, label: "Teslimat Süresi" },
+              { value: service.id === "logo" ? "3+" : `${service.features?.length || 0}`, label: service.id === "logo" ? "Alternatif" : "Özellik" },
+              { value: "∞", label: "Revizyon Hakkı" },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                style={{ textAlign: "center" }}
+              >
+                <div
+                  style={{
+                    fontSize: "clamp(2rem, 4vw, 3.5rem)",
+                    fontWeight: 300,
+                    color: "#000",
+                    lineHeight: 1,
+                    marginBottom: "8px",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {stat.value}
+                </div>
+                <div
+                  style={{
+                    fontSize: "10px",
+                    letterSpacing: "0.2em",
+                    color: "#999",
+                    textTransform: "uppercase",
+                    fontWeight: 400,
+                  }}
+                >
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </RevealSection>
+      </section>
+
+      {/* ─── FEATURES ─── */}
+      <section style={{ background: "#fafaf8", padding: "clamp(80px, 12vh, 160px) 0" }}>
+        <div
+          style={{
+            maxWidth: "1100px",
+            margin: "0 auto",
+            padding: "0 clamp(24px, 6vw, 80px)",
+          }}
+        >
+          <RevealSection>
+            <div style={{ marginBottom: "clamp(48px, 8vh, 96px)" }}>
+              <p style={{ fontSize: "10px", letterSpacing: "0.35em", color: "#aaa", textTransform: "uppercase", marginBottom: "16px", fontWeight: 400 }}>
                 Kapsam
               </p>
-              <h2 className="text-3xl md:text-4xl font-light mb-0" style={{ color: "#000" }}>Hizmet Kapsamı</h2>
-            </motion.div>
-
-            <div>
-              {service.features?.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={isContentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-                  transition={{ duration: 0.7, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <div style={{ height: "1px", background: "rgba(0,0,0,0.08)" }} />
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "clamp(16px, 3vw, 40px)", padding: "clamp(20px, 3vh, 32px) 0" }}>
-                    <span style={{ fontSize: "11px", fontWeight: 400, color: "#bbb", letterSpacing: "0.15em", flexShrink: 0 }}>
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{ fontSize: "clamp(18px, 2.5vw, 28px)", fontWeight: 500, color: "#000", margin: "0 0 8px 0", lineHeight: 1.1 }}>{feature.title}</h3>
-                      <p style={{ fontSize: "14px", color: "#666", lineHeight: 1.6, margin: 0, fontWeight: 300 }}>{feature.description}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              )) || <div style={{ color: "#666" }}>Özellikler yükleniyor...</div>}
-              <div style={{ height: "1px", background: "rgba(0,0,0,0.08)" }} />
+              <h2 style={{ fontSize: "clamp(2rem, 4vw, 4rem)", fontWeight: 300, color: "#000", margin: 0, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+                Hizmet Kapsamı
+              </h2>
             </div>
+          </RevealSection>
+
+          <div>
+            {service.features?.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -24 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.9, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ x: 6 }}
+              >
+                <div style={{ height: "1px", background: "rgba(0,0,0,0.07)" }} />
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "clamp(20px, 4vw, 56px)",
+                    padding: "clamp(24px, 4vh, 40px) 0",
+                    cursor: "default",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      fontWeight: 400,
+                      color: "#ccc",
+                      letterSpacing: "0.15em",
+                      flexShrink: 0,
+                      paddingTop: "6px",
+                      minWidth: "28px",
+                    }}
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <h3
+                      style={{
+                        fontSize: "clamp(18px, 2.5vw, 30px)",
+                        fontWeight: 500,
+                        color: "#000",
+                        margin: "0 0 10px 0",
+                        lineHeight: 1.1,
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {feature.title}
+                    </h3>
+                    <p
+                      style={{
+                        fontSize: "clamp(13px, 1.3vw, 15px)",
+                        color: "#777",
+                        lineHeight: 1.7,
+                        margin: 0,
+                        fontWeight: 300,
+                        maxWidth: "560px",
+                      }}
+                    >
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+            <div style={{ height: "1px", background: "rgba(0,0,0,0.07)" }} />
           </div>
         </div>
       </section>
 
-      {/* Logo Examples */}
-      {service.id === "logo" && service.examples && service.examples.length > 0 && (
-        <section ref={examplesRef} className="py-20" style={{ backgroundColor: "#000000" }}>
-          <div className="container mx-auto px-4">
-            <div className="max-w-7xl mx-auto">
-              <motion.div
-                className="text-center mb-16"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isExamplesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8 }}
-              >
-                <h2 className="text-4xl md:text-5xl font-light mb-6 text-white">Portföy</h2>
-                <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                  Özgün tasarım anlayışımızla hayata geçirdiğimiz logo çalışmaları
-                </p>
-                <div className="w-16 h-px bg-gray-700 mx-auto mt-8"></div>
-              </motion.div>
+      {/* ─── PROCESS ─── */}
+      <section
+        style={{
+          background: "#000000",
+          padding: "clamp(80px, 12vh, 160px) 0",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Parallax background orb */}
+        <motion.div
+          style={{
+            position: "absolute",
+            width: "80vw",
+            height: "80vw",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)",
+            left: "50%",
+            top: "50%",
+            x: "-50%",
+            y: "-50%",
+            pointerEvents: "none",
+          }}
+          animate={{
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
 
-              <motion.div
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isExamplesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                {service.examples.map((example, index) => (
-                  <motion.div
-                    key={index}
-                    className="relative aspect-square rounded-lg overflow-hidden bg-gray-800 group cursor-pointer border border-gray-700 hover:border-gray-600 transition-all duration-300"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: index * 0.03 }}
-                    whileHover={{ scale: 1.02 }}
-                    onClick={() => setSelectedExample(example)}
-                  >
-                    <Image
-                      src={example || "/placeholder.svg"}
-                      alt={`Logo ${index + 1}`}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                        <Play className="w-4 h-4 text-white" />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {/* Minimal Stats */}
-              <motion.div
-                className="grid grid-cols-3 gap-8 mt-20 pt-16 border-t border-gray-800"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isExamplesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                <div className="text-center">
-                  <div className="text-2xl font-light text-white mb-1">200+</div>
-                  <div className="text-gray-500 text-sm">Logo</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-white mb-1">15+</div>
-                  <div className="text-gray-500 text-sm">Sektör</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-white mb-1">100%</div>
-                  <div className="text-gray-500 text-sm">Memnuniyet</div>
-                </div>
-              </motion.div>
+        <div
+          style={{
+            maxWidth: "1100px",
+            margin: "0 auto",
+            padding: "0 clamp(24px, 6vw, 80px)",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <RevealSection>
+            <div style={{ marginBottom: "clamp(48px, 8vh, 96px)" }}>
+              <p style={{ fontSize: "10px", letterSpacing: "0.35em", color: "#444", textTransform: "uppercase", marginBottom: "16px", fontWeight: 400 }}>
+                Nasıl Çalışıyoruz
+              </p>
+              <h2 style={{ fontSize: "clamp(2rem, 4vw, 4rem)", fontWeight: 300, color: "#ffffff", margin: 0, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+                Süreç
+              </h2>
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* Corporate Identity Examples */}
-      {service.id === "identity" && service.examples && service.examples.length > 0 && (
-        <section ref={examplesRef} className="py-20" style={{ backgroundColor: "#000000" }}>
-          <div className="container mx-auto px-4">
-            <div className="max-w-7xl mx-auto">
-              <motion.div
-                className="text-center mb-16"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isExamplesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8 }}
-              >
-                <h2 className="text-4xl md:text-5xl font-light mb-6 text-white">Portföy</h2>
-                <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                  Tutarlı kurumsal kimlik tasarımlarımızla markaların profesyonel görünümünü güçlendiriyoruz
-                </p>
-                <div className="w-16 h-px bg-gray-700 mx-auto mt-8"></div>
-              </motion.div>
-
-              <motion.div
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isExamplesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                {service.examples.map((example, index) => (
-                  <motion.div
-                    key={index}
-                    className="relative aspect-square rounded-lg overflow-hidden bg-gray-800 group cursor-pointer border border-gray-700 hover:border-gray-600 transition-all duration-300"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: index * 0.03 }}
-                    whileHover={{ scale: 1.02 }}
-                    onClick={() => setSelectedExample(example)}
-                  >
-                    <Image
-                      src={example || "/placeholder.svg"}
-                      alt={`Kurumsal Kimlik ${index + 1}`}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                        <Play className="w-4 h-4 text-white" />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {/* Minimal Stats for Corporate Identity */}
-              <motion.div
-                className="grid grid-cols-3 gap-8 mt-20 pt-16 border-t border-gray-800"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isExamplesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                <div className="text-center">
-                  <div className="text-2xl font-light text-white mb-1">150+</div>
-                  <div className="text-gray-500 text-sm">Kurumsal Kimlik</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-white mb-1">20+</div>
-                  <div className="text-gray-500 text-sm">Sektör</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-white mb-1">100%</div>
-                  <div className="text-gray-500 text-sm">Memnuniyet</div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Website Examples */}
-      {service.id === "website" && service.examples && service.examples.length > 0 && (
-        <section ref={examplesRef} className="py-20" style={{ backgroundColor: "#000000" }}>
-          <div className="container mx-auto px-4">
-            <div className="max-w-7xl mx-auto">
-              <motion.div
-                className="text-center mb-16"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isExamplesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8 }}
-              >
-                <h2 className="text-4xl md:text-5xl font-light mb-6 text-white">Portföy</h2>
-                <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                  Modern teknolojiler ve kullanıcı deneyimi odaklı web sitesi tasarımlarımız
-                </p>
-                <div className="w-16 h-px bg-gray-700 mx-auto mt-8"></div>
-              </motion.div>
-
-              <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isExamplesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                {service.examples.map((example, index) => (
-                  <motion.div
-                    key={index}
-                    className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-800 group cursor-pointer border border-gray-700 hover:border-gray-600 transition-all duration-300"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                    whileHover={{ scale: 1.02 }}
-                    onClick={() => setSelectedExample(example)}
-                  >
-                    <Image
-                      src={example || "/placeholder.svg"}
-                      alt={`Web Sitesi ${index + 1}`}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                        <Play className="w-5 h-5 text-white" />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {/* Minimal Stats for Website */}
-              <motion.div
-                className="grid grid-cols-3 gap-8 mt-20 pt-16 border-t border-gray-800"
-                initial={{ opacity: 0, y: 30 }}
-                animate={isExamplesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                <div className="text-center">
-                  <div className="text-2xl font-light text-white mb-1">100+</div>
-                  <div className="text-gray-500 text-sm">Web Sitesi</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-white mb-1">25+</div>
-                  <div className="text-gray-500 text-sm">Sektör</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-light text-white mb-1">99%</div>
-                  <div className="text-gray-500 text-sm">Uptime</div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Process Section - Vertical elegant list */}
-      <section style={{ backgroundColor: "#000000", paddingTop: "clamp(60px, 10vh, 120px)", paddingBottom: "clamp(60px, 10vh, 120px)" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto", paddingLeft: "clamp(24px, 6vw, 80px)", paddingRight: "clamp(24px, 6vw, 80px)" }}>
-          <motion.div
-            style={{ marginBottom: "clamp(48px, 8vh, 96px)" }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={isContentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <p style={{ fontSize: "11px", letterSpacing: "0.3em", color: "#555", textTransform: "uppercase", marginBottom: "12px", fontWeight: 400 }}>
-              Nasıl Çalışıyoruz
-            </p>
-            <h2 style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 300, color: "#ffffff", margin: 0, lineHeight: 1.1 }}>
-              Süreç
-            </h2>
-          </motion.div>
+          </RevealSection>
 
           <div>
             {service.process?.map((step, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 24 }}
-                animate={isContentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-                transition={{ duration: 0.8, delay: 0.5 + index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 1, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div style={{ height: "1px", background: "rgba(255,255,255,0.06)" }} />
-                <div style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "clamp(24px, 5vw, 80px)",
-                  padding: "clamp(28px, 4vh, 48px) 0",
-                }}>
-                  {/* Step number */}
-                  <span style={{
-                    fontSize: "clamp(32px, 5vw, 56px)",
-                    fontWeight: 200,
-                    color: "rgba(255,255,255,0.12)",
-                    lineHeight: 1,
-                    flexShrink: 0,
-                    fontVariantNumeric: "tabular-nums",
-                    letterSpacing: "-0.02em",
-                    minWidth: "clamp(40px, 6vw, 80px)",
-                  }}>
+                <div style={{ height: "1px", background: "rgba(255,255,255,0.05)" }} />
+                <motion.div
+                  whileHover={{ x: 8 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "clamp(24px, 5vw, 80px)",
+                    padding: "clamp(32px, 5vh, 56px) 0",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "clamp(36px, 5vw, 64px)",
+                      fontWeight: 200,
+                      color: "rgba(255,255,255,0.08)",
+                      lineHeight: 1,
+                      flexShrink: 0,
+                      letterSpacing: "-0.02em",
+                      minWidth: "clamp(48px, 7vw, 90px)",
+                    }}
+                  >
                     {String(index + 1).padStart(2, "0")}
                   </span>
-
-                  {/* Content */}
-                  <div style={{ flex: 1, paddingTop: "4px" }}>
-                    <h3 style={{
-                      fontSize: "clamp(18px, 2.5vw, 28px)",
-                      fontWeight: 400,
-                      color: "#ffffff",
-                      margin: "0 0 12px 0",
-                      lineHeight: 1.2,
-                      letterSpacing: "-0.01em",
-                    }}>
+                  <div style={{ flex: 1, paddingTop: "6px" }}>
+                    <h3
+                      style={{
+                        fontSize: "clamp(18px, 2.5vw, 30px)",
+                        fontWeight: 400,
+                        color: "#ffffff",
+                        margin: "0 0 12px 0",
+                        lineHeight: 1.2,
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
                       {step.step}
                     </h3>
-                    <p style={{
-                      fontSize: "clamp(13px, 1.4vw, 16px)",
-                      color: "rgba(255,255,255,0.45)",
-                      lineHeight: 1.7,
-                      margin: 0,
-                      fontWeight: 300,
-                      maxWidth: "560px",
-                    }}>
+                    <p
+                      style={{
+                        fontSize: "clamp(13px, 1.3vw, 15px)",
+                        color: "rgba(255,255,255,0.38)",
+                        lineHeight: 1.8,
+                        margin: 0,
+                        fontWeight: 300,
+                        maxWidth: "520px",
+                      }}
+                    >
                       {step.description}
                     </p>
                     {step.step === "Teslim & Rehber" && (
-                      <button
-                        style={{ marginTop: "20px", display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.08)", color: "#fff", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "6px", padding: "10px 20px", fontSize: "12px", fontWeight: 300, cursor: "pointer", letterSpacing: "0.05em" }}
+                      <motion.button
+                        whileHover={{ scale: 1.02, borderColor: "rgba(255,255,255,0.25)" }}
+                        whileTap={{ scale: 0.98 }}
+                        style={{
+                          marginTop: "20px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          background: "transparent",
+                          color: "rgba(255,255,255,0.6)",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          borderRadius: "4px",
+                          padding: "10px 20px",
+                          fontSize: "11px",
+                          fontWeight: 300,
+                          cursor: "pointer",
+                          letterSpacing: "0.1em",
+                          fontFamily: "'Poppins', sans-serif",
+                        }}
                       >
-                        <Download className="w-3 h-3" />
-                        <span>Örnek Brand Guide PDF İndir</span>
-                      </button>
+                        <Download style={{ width: "12px", height: "12px" }} />
+                        <span>Örnek Brand Guide PDF</span>
+                      </motion.button>
                     )}
                   </div>
-                </div>
+                </motion.div>
               </motion.div>
-            )) || <div style={{ color: "rgba(255,255,255,0.4)" }}>Süreç bilgileri yükleniyor...</div>}
-            <div style={{ height: "1px", background: "rgba(255,255,255,0.06)" }} />
+            ))}
+            <div style={{ height: "1px", background: "rgba(255,255,255,0.05)" }} />
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section style={{ backgroundColor: "#ffffff", paddingTop: "clamp(60px, 10vh, 120px)", paddingBottom: "clamp(60px, 10vh, 120px)" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto", paddingLeft: "clamp(24px, 6vw, 80px)", paddingRight: "clamp(24px, 6vw, 80px)" }}>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isContentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
+      {/* ─── CTA ─── */}
+      <section
+        style={{
+          background: "#fafaf8",
+          padding: "clamp(100px, 15vh, 200px) 0",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Large background text */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            pointerEvents: "none",
+            overflow: "hidden",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "clamp(80px, 20vw, 240px)",
+              fontWeight: 700,
+              color: "rgba(0,0,0,0.03)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1,
+              userSelect: "none",
+              whiteSpace: "nowrap",
+            }}
           >
-            <div style={{ height: "1px", background: "rgba(0,0,0,0.08)", marginBottom: "clamp(40px, 6vh, 80px)" }} />
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "32px" }}>
-              <div>
-                <p style={{ fontSize: "11px", letterSpacing: "0.3em", color: "#aaa", textTransform: "uppercase", marginBottom: "12px", fontWeight: 400 }}>
-                  Projenizi Başlatalım
-                </p>
-                <h2 style={{ fontSize: "clamp(32px, 5vw, 64px)", fontWeight: 300, color: "#000", margin: 0, lineHeight: 1.1 }}>
-                  Başlayalım
-                </h2>
-              </div>
-              <p style={{ fontSize: "clamp(15px, 1.8vw, 20px)", color: "#666", fontWeight: 300, maxWidth: "480px", lineHeight: 1.6, margin: 0 }}>
+            Başlayalım
+          </span>
+        </div>
+
+        <div
+          style={{
+            maxWidth: "1100px",
+            margin: "0 auto",
+            padding: "0 clamp(24px, 6vw, 80px)",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <RevealSection>
+            <div style={{ textAlign: "center" }}>
+              <p
+                style={{
+                  fontSize: "10px",
+                  letterSpacing: "0.35em",
+                  color: "#aaa",
+                  textTransform: "uppercase",
+                  marginBottom: "24px",
+                  fontWeight: 400,
+                }}
+              >
+                Projenizi Başlatalım
+              </p>
+              <h2
+                style={{
+                  fontSize: "clamp(2.5rem, 6vw, 6rem)",
+                  fontWeight: 300,
+                  color: "#000",
+                  margin: "0 0 32px 0",
+                  lineHeight: 1.05,
+                  letterSpacing: "-0.03em",
+                }}
+              >
+                Başlayalım
+              </h2>
+              <p
+                style={{
+                  fontSize: "clamp(14px, 1.6vw, 18px)",
+                  color: "#888",
+                  fontWeight: 300,
+                  maxWidth: "440px",
+                  lineHeight: 1.7,
+                  margin: "0 auto 48px",
+                }}
+              >
                 Markanız için özgün tasarım oluşturmak üzere projenizi başlatalım.
               </p>
               <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center" }}>
-                <a
+                <motion.a
                   href="/iletisim"
+                  whileHover={{ scale: 1.02, backgroundColor: "#111" }}
+                  whileTap={{ scale: 0.98 }}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    padding: "14px 32px",
+                    padding: "16px 40px",
                     background: "#000",
                     color: "#fff",
                     textDecoration: "none",
-                    fontSize: "12px",
+                    fontSize: "11px",
                     fontWeight: 400,
-                    letterSpacing: "0.15em",
+                    letterSpacing: "0.2em",
                     textTransform: "uppercase",
                     borderRadius: "4px",
-                    transition: "opacity 0.3s ease",
+                    transition: "background 0.3s ease",
                   }}
                 >
                   Proje Başlat
-                </a>
-                <a
+                </motion.a>
+                <motion.a
                   href="/iletisim"
+                  whileHover={{ scale: 1.02, borderColor: "rgba(0,0,0,0.4)" }}
+                  whileTap={{ scale: 0.98 }}
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    padding: "14px 32px",
+                    padding: "16px 40px",
                     background: "transparent",
                     color: "#000",
                     textDecoration: "none",
-                    fontSize: "12px",
+                    fontSize: "11px",
                     fontWeight: 400,
-                    letterSpacing: "0.15em",
+                    letterSpacing: "0.2em",
                     textTransform: "uppercase",
                     border: "1px solid rgba(0,0,0,0.15)",
                     borderRadius: "4px",
@@ -513,38 +712,15 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
                   }}
                 >
                   İletişim
-                </a>
+                </motion.a>
               </div>
             </div>
-          </motion.div>
+          </RevealSection>
         </div>
       </section>
 
       <Footer />
-
-      {/* Lightbox */}
-      {selectedExample && (
-        <div
-          className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedExample(null)}
-        >
-          <div className="relative max-w-4xl max-h-[90vh] w-full h-full">
-            <Image
-              src={selectedExample || "/placeholder.svg"}
-              alt="Logo detay"
-              fill
-              className="object-contain"
-              sizes="90vw"
-            />
-            <button
-              onClick={() => setSelectedExample(null)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-lg bg-gray-900/80 backdrop-blur-sm flex items-center justify-center text-white hover:bg-gray-800 transition-colors"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      )}
+      <MobileBottomNav />
     </div>
   )
 }
