@@ -66,12 +66,12 @@ export default function ScrollablePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
             {/* Left side - Phone Mockup with Video */}
-            <div className="flex justify-center group order-2 lg:order-1">
+            <div className="flex justify-center group order-1 lg:order-1">
               <YouTubePhoneMockup />
             </div>
 
             {/* Right side - Story Content */}
-            <div className="h-full flex flex-col justify-between order-1 lg:order-2">
+            <div className="h-full flex flex-col justify-between order-2 lg:order-2">
               <div className="space-y-6">
                 <div>
                   <h3 className="text-2xl md:text-3xl lg:text-4xl font-light mb-4 text-black">
