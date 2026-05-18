@@ -272,7 +272,14 @@ const services = [
       },
     ],
     deliveryTime: "Sürekli hizmet",
-    examples: ["/images/social-example-1.jpg", "/images/social-example-2.jpg", "/images/social-example-3.jpg"],
+    examples: [
+      "/images/1.png",
+      "/images/2.png",
+      "/images/3.png",
+      "/images/4.png",
+      "/images/5.png",
+      "/images/6.png",
+    ],
   },
   {
     id: "brand",
@@ -331,7 +338,7 @@ const services = [
       },
     ],
     deliveryTime: "6-12 ay",
-    examples: ["/images/trademark-example-1.jpg", "/images/trademark-example-2.jpg", "/images/trademark-example-3.jpg"],
+    examples: [],
   },
   {
     id: "production",
@@ -391,11 +398,7 @@ const services = [
       },
     ],
     deliveryTime: "10-20 iş günü",
-    examples: [
-      "/images/production-example-1.jpg",
-      "/images/production-example-2.jpg",
-      "/images/production-example-3.jpg",
-    ],
+    examples: [],
   },
 ]
 

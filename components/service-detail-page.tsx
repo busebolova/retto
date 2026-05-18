@@ -60,7 +60,19 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
   const containerRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [selectedExample, setSelectedExample] = useState<string | null>(null)
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+  const examples = service?.examples ?? []
+
+  const openLightbox = (index: number) => setSelectedIndex(index)
+  const closeLightbox = () => setSelectedIndex(null)
+  const goPrev = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    setSelectedIndex((i) => (i !== null && i > 0 ? i - 1 : i))
+  }
+  const goNext = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    setSelectedIndex((i) => (i !== null && i < examples.length - 1 ? i + 1 : i))
+  }
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -87,6 +99,17 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
     window.addEventListener("mousemove", handleMouse)
     return () => window.removeEventListener("mousemove", handleMouse)
   }, [])
+
+  useEffect(() => {
+    if (selectedIndex === null) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goPrev()
+      else if (e.key === "ArrowRight") goNext()
+      else if (e.key === "Escape") closeLightbox()
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => window.removeEventListener("keydown", handleKey)
+  }, [selectedIndex, examples.length])
 
   const currentIndex = SERVICE_NAV.findIndex((s) => s.slug === service?.slug)
   const prevService = currentIndex > 0 ? SERVICE_NAV[currentIndex - 1] : null
@@ -358,9 +381,7 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: service.id === "website"
-                  ? "repeat(auto-fill, minmax(min(100%, 340px), 1fr))"
-                  : "repeat(auto-fill, minmax(min(100%, 240px), 1fr))",
+                gridTemplateColumns: "repeat(3, 1fr)",
                 gap: "clamp(12px, 2vw, 20px)",
               }}
             >
@@ -372,7 +393,7 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
                   viewport={{ once: true, amount: 0.1 }}
                   transition={{ duration: 0.7, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
                   whileHover={{ scale: 1.02 }}
-                  onClick={() => setSelectedExample(example)}
+                  onClick={() => openLightbox(index)}
                   style={{
                     position: "relative",
                     aspectRatio: service.id === "website" ? "4/3" : "1/1",
@@ -576,10 +597,11 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
             gap: "16px",
           }}
         >
+          {/* Sol: Önceki */}
           {prevService ? (
             <Link
               href={`/hizmetler/${prevService.slug}`}
-              style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "12px", color: "#000", flex: 1 }}
+              style={{ textDecoration: "none", flex: 1 }}
             >
               <motion.div
                 whileHover={{ x: -4 }}
@@ -596,9 +618,20 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
               </motion.div>
             </Link>
           ) : (
-            <div style={{ flex: 1 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", opacity: 0.2, pointerEvents: "none" }}>
+                <div style={{ width: "36px", height: "36px", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <ChevronLeft style={{ width: "16px", height: "16px", color: "#000" }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: "9px", letterSpacing: "0.2em", color: "#aaa", textTransform: "uppercase", marginBottom: "4px" }}>Önceki</div>
+                  <div style={{ fontSize: "clamp(13px, 1.5vw, 16px)", fontWeight: 500, color: "#000", letterSpacing: "-0.01em" }}>—</div>
+                </div>
+              </div>
+            </div>
           )}
 
+          {/* Orta: nokta göstergesi */}
           <Link
             href="/hizmetler"
             style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", flexShrink: 0 }}
@@ -619,10 +652,11 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
             <span style={{ fontSize: "9px", letterSpacing: "0.2em", color: "#aaa", textTransform: "uppercase" }}>Tüm Hizmetler</span>
           </Link>
 
+          {/* Sağ: Sonraki */}
           {nextService ? (
             <Link
               href={`/hizmetler/${nextService.slug}`}
-              style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "12px", color: "#000", flex: 1 }}
+              style={{ textDecoration: "none", flex: 1, display: "flex", justifyContent: "flex-end" }}
             >
               <motion.div
                 whileHover={{ x: 4 }}
@@ -639,7 +673,17 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
               </motion.div>
             </Link>
           ) : (
-            <div style={{ flex: 1 }} />
+            <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", opacity: 0.2, pointerEvents: "none" }}>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: "9px", letterSpacing: "0.2em", color: "#aaa", textTransform: "uppercase", marginBottom: "4px" }}>Sonraki</div>
+                  <div style={{ fontSize: "clamp(13px, 1.5vw, 16px)", fontWeight: 500, color: "#000", letterSpacing: "-0.01em" }}>—</div>
+                </div>
+                <div style={{ width: "36px", height: "36px", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <ChevronRight style={{ width: "16px", height: "16px", color: "#000" }} />
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </section>
@@ -647,11 +691,11 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
       <Footer />
       <MobileBottomNav />
 
-      {selectedExample && (
+      {selectedIndex !== null && examples[selectedIndex] && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          onClick={() => setSelectedExample(null)}
+          onClick={closeLightbox}
           style={{
             position: "fixed",
             inset: 0,
@@ -664,35 +708,118 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
             padding: "24px",
           }}
         >
-          <div style={{ position: "relative", maxWidth: "90vw", maxHeight: "90vh", width: "100%", height: "100%" }}>
+          {/* Görsel */}
+          <div
+            style={{ position: "relative", maxWidth: "90vw", maxHeight: "90vh", width: "100%", height: "100%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <Image
-              src={selectedExample}
-              alt="Portföy detay"
+              src={examples[selectedIndex]}
+              alt={`Portföy ${selectedIndex + 1}`}
               fill
               style={{ objectFit: "contain" }}
               sizes="90vw"
             />
+          </div>
+
+          {/* Kapat */}
+          <button
+            onClick={closeLightbox}
+            style={{
+              position: "fixed",
+              top: "20px",
+              right: "20px",
+              width: "44px",
+              height: "44px",
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              color: "#fff",
+              fontSize: "22px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10000,
+            }}
+          >
+            ×
+          </button>
+
+          {/* Sol ok */}
+          {selectedIndex > 0 && (
             <button
-              onClick={() => setSelectedExample(null)}
+              onClick={goPrev}
               style={{
-                position: "absolute",
-                top: "16px",
-                right: "16px",
-                width: "40px",
-                height: "40px",
-                borderRadius: "8px",
+                position: "fixed",
+                left: "20px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "48px",
+                height: "48px",
+                borderRadius: "50%",
                 background: "rgba(255,255,255,0.1)",
-                border: "none",
+                border: "1px solid rgba(255,255,255,0.15)",
                 color: "#fff",
                 fontSize: "20px",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                zIndex: 10000,
+                transition: "background 0.2s ease",
               }}
+              onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.2)")}
+              onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
             >
-              ×
+              ‹
             </button>
+          )}
+
+          {/* Sağ ok */}
+          {selectedIndex < examples.length - 1 && (
+            <button
+              onClick={goNext}
+              style={{
+                position: "fixed",
+                right: "20px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "48px",
+                height: "48px",
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "#fff",
+                fontSize: "20px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 10000,
+                transition: "background 0.2s ease",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.2)")}
+              onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
+            >
+              ›
+            </button>
+          )}
+
+          {/* Sayaç */}
+          <div
+            style={{
+              position: "fixed",
+              bottom: "24px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              fontSize: "11px",
+              letterSpacing: "0.2em",
+              color: "rgba(255,255,255,0.4)",
+              zIndex: 10000,
+            }}
+          >
+            {selectedIndex + 1} / {examples.length}
           </div>
         </motion.div>
       )}

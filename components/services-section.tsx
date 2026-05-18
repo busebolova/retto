@@ -40,9 +40,9 @@ const services = [
     tag: "Creative Production",
   },
   {
-    id: "strategy",
+    id: "brand",
     num: "06",
-    title: "Marka Stratejisi",
+    title: "Marka Tescil",
     sub: "Direction & Positioning",
     tag: "Strategy",
   },

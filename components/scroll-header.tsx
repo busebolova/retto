@@ -34,7 +34,7 @@ function MenuIcon({ open }: { open: boolean }) {
         height: "1.5px",
         background: "currentColor",
         transformOrigin: "center",
-        transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
+        transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease",
         transform: open ? "translateY(7px) rotate(45deg)" : "none",
       }} />
       {/* Orta çizgi */}
@@ -43,7 +43,7 @@ function MenuIcon({ open }: { open: boolean }) {
         height: "1.5px",
         background: "currentColor",
         transformOrigin: "center",
-        transition: "opacity 0.25s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+        transition: "opacity 0.15s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
         opacity: open ? 0 : 1,
         transform: open ? "scaleX(0)" : "none",
         width: open ? "100%" : "70%",
@@ -54,7 +54,7 @@ function MenuIcon({ open }: { open: boolean }) {
         height: "1.5px",
         background: "currentColor",
         transformOrigin: "center",
-        transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
+        transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease",
         transform: open ? "translateY(-7px) rotate(-45deg)" : "none",
       }} />
     </div>
@@ -187,7 +187,7 @@ function ScrollHeader({ sticky = false }: ScrollHeaderProps) {
           alignItems: "flex-start",
           justifyContent: "center",
           padding: "0 10vw",
-          transition: "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s ease",
+          transition: "opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s ease",
           opacity: menuOpen ? 1 : 0,
           visibility: menuOpen ? "visible" : "hidden",
           pointerEvents: menuOpen ? "all" : "none",
@@ -216,10 +216,10 @@ function ScrollHeader({ sticky = false }: ScrollHeaderProps) {
                     : "rgba(255,255,255,0.35)",
                   fontFamily: "'Poppins', system-ui, sans-serif",
                   transition: "color 0.3s ease, transform 0.3s ease",
-                  transform: menuOpen ? "translateY(0)" : "translateY(100%)",
-                  transitionDelay: menuOpen ? `${i * 0.06}s` : "0s",
+                  transform: menuOpen ? "translateY(0)" : "translateY(60%)",
+                  transitionDelay: menuOpen ? `${i * 0.03}s` : "0s",
                   transitionProperty: "color, transform",
-                  transitionDuration: "0.3s, 0.5s",
+                  transitionDuration: "0.2s, 0.28s",
                   transitionTimingFunction: "ease, cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
                 onMouseEnter={e => {
@@ -269,7 +269,7 @@ function ScrollHeader({ sticky = false }: ScrollHeaderProps) {
             justifyContent: "space-between",
             alignItems: "flex-end",
             opacity: menuOpen ? 1 : 0,
-            transition: "opacity 0.5s ease 0.4s",
+            transition: "opacity 0.25s ease 0.15s",
           }}
         >
           <div>

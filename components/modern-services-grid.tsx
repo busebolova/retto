@@ -38,7 +38,7 @@ const services = [
   {
     id: "brand",
     num: "06",
-    title: "Marka Stratejisi",
+    title: "Marka Tescil",
     slug: "marka-tescil",
   },
 ]
