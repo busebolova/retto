@@ -26,7 +26,7 @@ const services = [
   {
     id: "social",
     num: "04",
-    title: "Dijital Varlık",
+    title: "Sosyal Medya",
     slug: "sosyal-medya",
   },
   {

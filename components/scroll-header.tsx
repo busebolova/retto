@@ -182,7 +182,7 @@ function ScrollHeader({ sticky = false }: ScrollHeaderProps) {
           position: "fixed",
           inset: 0,
           zIndex: 190,
-          background: "#0a0a0a",
+          background: "#000000",
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "center",
