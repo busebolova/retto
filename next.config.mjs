@@ -9,19 +9,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-
-  // Experimental: faster builds
-  experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['framer-motion', 'lucide-react', 'three'],
-  },
   
-  // Image optimization — unoptimized KALDIRILDI
+  // Image optimization
   images: {
-    formats: ['image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200],
-    imageSizes: [16, 32, 64, 96, 128, 256],
-    minimumCacheTTL: 31536000,
+    formats: ['image/avif', 'image/webp'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
@@ -34,6 +25,7 @@ const nextConfig = {
         hostname: '**.cloudinary.com',
       },
     ],
+    unoptimized: true,
   },
 
   // Headers for SEO and security
