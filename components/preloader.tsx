@@ -10,6 +10,12 @@ export default function Preloader() {
   const [done, setDone] = useState(false)
 
   useEffect(() => {
+    // Mobilde preloader'ı atla — performans için
+    if (window.innerWidth < 768) {
+      setDone(true)
+      return
+    }
+
     const t1 = setTimeout(() => setLogoReady(true), 120)
     const t2 = setTimeout(() => setBreathe(true), 750)
     const t3 = setTimeout(() => setExit(true), 1700)

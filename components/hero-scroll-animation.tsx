@@ -1,13 +1,17 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const ThreeModel = dynamic(() => import("./three-model"), { ssr: false })
+// Mobilde Three.js yüklenmez — performans için
+const ThreeModel = dynamic(() => import("./three-model"), {
+  ssr: false,
+  loading: () => null,
+})
 
 export default function HeroScrollAnimation() {
   const outerRef = useRef<HTMLDivElement>(null)
@@ -15,8 +19,11 @@ export default function HeroScrollAnimation() {
   const textRef = useRef<HTMLParagraphElement>(null)
   const canvasWrapRef = useRef<HTMLDivElement>(null)
   const bgTextRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(true) // SSR'da mobile varsay
 
   useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+
     const outer = outerRef.current
     const h1 = h1Ref.current
     const textEl = textRef.current
@@ -137,22 +144,31 @@ export default function HeroScrollAnimation() {
           />
         </div>
 
-        {/* 3D model - tam ortada */}
-        <div
-          ref={canvasWrapRef}
-          style={{
-            position: "absolute",
-            width: "min(82vw, 82vh)",
-            height: "min(82vw, 82vh)",
-            left: "50%",
-            top: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: 6,
-            willChange: "transform, opacity",
-          }}
-        >
-          <ThreeModel />
-        </div>
+        {/* 3D model - sadece desktop */}
+        {!isMobile && (
+          <div
+            ref={canvasWrapRef}
+            style={{
+              position: "absolute",
+              width: "min(82vw, 82vh)",
+              height: "min(82vw, 82vh)",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 6,
+              willChange: "transform, opacity",
+            }}
+          >
+            <ThreeModel />
+          </div>
+        )}
+        {/* Mobilde canvasWrap ref için görünmez div */}
+        {isMobile && (
+          <div
+            ref={canvasWrapRef}
+            style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+          />
+        )}
 
         {/* Scroll sonrası beliren metin */}
         <p

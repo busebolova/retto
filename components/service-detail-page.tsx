@@ -1,8 +1,10 @@
 "use client"
 
 import { useRef, useState, useEffect } from "react"
-import { motion, useScroll, useTransform, useSpring, useInView } from "framer-motion"
-import { Download } from "lucide-react"
+import { motion, useScroll, useTransform, useInView } from "framer-motion"
+import { Download, ChevronLeft, ChevronRight } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 import Footer from "@/components/footer"
 import ScrollHeader from "@/components/scroll-header"
 import MobileBottomNav from "@/components/mobile-bottom-nav"
@@ -30,28 +32,16 @@ interface ServiceData {
   examples?: string[]
 }
 
-// Parallax hook
-function useParallax(value: any, distance: number) {
-  return useTransform(value, [0, 1], [-distance, distance])
-}
+// Hizmet navigasyonu
+const SERVICE_NAV = [
+  { slug: "logo-tasarimi", title: "Logo Tasarımı" },
+  { slug: "kurumsal-kimlik", title: "Kurumsal Kimlik" },
+  { slug: "web-sitesi", title: "Web Sitesi" },
+  { slug: "sosyal-medya", title: "Sosyal Medya" },
+  { slug: "produksiyon", title: "Prodüksiyon" },
+  { slug: "marka-tescil", title: "Marka Stratejisi" },
+]
 
-// Animated counter
-function AnimatedNumber({ value, suffix = "" }: { value: string; suffix?: string }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
-  return (
-    <motion.span
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {value}{suffix}
-    </motion.span>
-  )
-}
-
-// Section reveal
 function RevealSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, amount: 0.15 })
@@ -71,27 +61,18 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
   const containerRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  })
+  const [selectedExample, setSelectedExample] = useState<string | null>(null)
 
   const { scrollYProgress: heroScroll } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   })
 
-  // Parallax transforms
-  const heroTitleY = useTransform(heroScroll, [0, 1], [0, -120])
-  const heroSubtitleY = useTransform(heroScroll, [0, 1], [0, -60])
-  const heroOpacity = useTransform(heroScroll, [0, 0.7], [1, 0])
-  const heroBgY = useTransform(heroScroll, [0, 1], [0, 80])
+  const heroTitleY = useTransform(heroScroll, [0, 1], [0, -100])
+  const heroSubtitleY = useTransform(heroScroll, [0, 1], [0, -50])
+  const heroOpacity = useTransform(heroScroll, [0, 0.8], [1, 0])
+  const heroBgY = useTransform(heroScroll, [0, 1], [0, 60])
 
-  // Smooth spring
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 })
-
-  // Mouse parallax for hero
   useEffect(() => {
     const handleMouse = (e: MouseEvent) => {
       setMousePos({
@@ -102,6 +83,11 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
     window.addEventListener("mousemove", handleMouse)
     return () => window.removeEventListener("mousemove", handleMouse)
   }, [])
+
+  // Önceki / sonraki hizmet
+  const currentIndex = SERVICE_NAV.findIndex((s) => s.slug === service.slug)
+  const prevService = currentIndex > 0 ? SERVICE_NAV[currentIndex - 1] : null
+  const nextService = currentIndex < SERVICE_NAV.length - 1 ? SERVICE_NAV[currentIndex + 1] : null
 
   if (!service) {
     return (
@@ -123,7 +109,7 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
     >
       <ScrollHeader />
 
-      {/* ─── HERO ─── */}
+      {/* ─── HERO — BEYAZ ─── */}
       <section
         ref={heroRef}
         style={{
@@ -133,49 +119,46 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
           alignItems: "center",
           justifyContent: "center",
           overflow: "hidden",
-          background: "#080808",
+          background: "#fafaf8",
         }}
       >
-        {/* Parallax background texture */}
         <motion.div
           style={{
             position: "absolute",
             inset: "-20%",
-            backgroundImage: `radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 70%)`,
+            backgroundImage: "radial-gradient(ellipse 70% 55% at 50% 50%, rgba(0,0,0,0.025) 0%, transparent 70%)",
             y: heroBgY,
+            pointerEvents: "none",
           }}
         />
 
-        {/* Grain */}
         <div
           style={{
             position: "absolute",
             inset: 0,
-            opacity: 0.04,
+            opacity: 0.025,
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
             backgroundSize: "128px 128px",
             pointerEvents: "none",
           }}
         />
 
-        {/* Mouse parallax orb */}
         <motion.div
           style={{
             position: "absolute",
-            width: "60vw",
-            height: "60vw",
+            width: "50vw",
+            height: "50vw",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(0,0,0,0.02) 0%, transparent 70%)",
             left: "50%",
             top: "50%",
-            x: mousePos.x * 30 - 200,
-            y: mousePos.y * 20 - 200,
+            x: mousePos.x * 25 - 200,
+            y: mousePos.y * 15 - 200,
             pointerEvents: "none",
           }}
           transition={{ type: "spring", stiffness: 60, damping: 20 }}
         />
 
-        {/* Hero content */}
         <div
           style={{
             position: "relative",
@@ -185,7 +168,6 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
             maxWidth: "900px",
           }}
         >
-          {/* Service number */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -193,7 +175,7 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
             style={{
               fontSize: "10px",
               letterSpacing: "0.4em",
-              color: "rgba(255,255,255,0.25)",
+              color: "rgba(0,0,0,0.3)",
               textTransform: "uppercase",
               marginBottom: "32px",
               fontWeight: 300,
@@ -202,12 +184,11 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
             Hizmet
           </motion.p>
 
-          {/* Title with parallax */}
           <motion.h1
             style={{
               fontSize: "clamp(3rem, 9vw, 9rem)",
               fontWeight: 500,
-              color: "#ffffff",
+              color: "#000000",
               lineHeight: 0.95,
               letterSpacing: "-0.03em",
               margin: "0 0 32px 0",
@@ -221,11 +202,10 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
             {service.title}
           </motion.h1>
 
-          {/* Subtitle */}
           <motion.p
             style={{
               fontSize: "clamp(14px, 1.8vw, 20px)",
-              color: "rgba(255,255,255,0.4)",
+              color: "rgba(0,0,0,0.45)",
               fontWeight: 300,
               lineHeight: 1.6,
               maxWidth: "560px",
@@ -239,72 +219,36 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
             {service.subtitle}
           </motion.p>
 
-          {/* Scroll indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.8 }}
-            style={{
-              position: "absolute",
-              bottom: "-40vh",
-              left: "50%",
-              transform: "translateX(-50%)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "8px",
-            }}
+            style={{ position: "absolute", bottom: "-38vh", left: "50%", transform: "translateX(-50%)" }}
           >
             <motion.div
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-              style={{
-                width: "1px",
-                height: "48px",
-                background: "linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)",
-              }}
+              style={{ width: "1px", height: "48px", background: "linear-gradient(to bottom, rgba(0,0,0,0.2), transparent)" }}
             />
           </motion.div>
         </div>
 
-        {/* Corner accents */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.8, duration: 0.8 }}
-          style={{
-            position: "absolute",
-            top: "clamp(20px, 4vh, 48px)",
-            left: "clamp(20px, 4vw, 48px)",
-            width: "32px",
-            height: "32px",
-            borderTop: "1px solid rgba(255,255,255,0.1)",
-            borderLeft: "1px solid rgba(255,255,255,0.1)",
-          }}
+          style={{ position: "absolute", top: "clamp(20px, 4vh, 48px)", left: "clamp(20px, 4vw, 48px)", width: "32px", height: "32px", borderTop: "1px solid rgba(0,0,0,0.1)", borderLeft: "1px solid rgba(0,0,0,0.1)" }}
         />
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.9, duration: 0.8 }}
-          style={{
-            position: "absolute",
-            bottom: "clamp(20px, 4vh, 48px)",
-            right: "clamp(20px, 4vw, 48px)",
-            width: "32px",
-            height: "32px",
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
-            borderRight: "1px solid rgba(255,255,255,0.1)",
-          }}
+          style={{ position: "absolute", bottom: "clamp(20px, 4vh, 48px)", right: "clamp(20px, 4vw, 48px)", width: "32px", height: "32px", borderBottom: "1px solid rgba(0,0,0,0.1)", borderRight: "1px solid rgba(0,0,0,0.1)" }}
         />
       </section>
 
       {/* ─── STATS BAR ─── */}
-      <section
-        style={{
-          background: "#ffffff",
-          borderBottom: "1px solid rgba(0,0,0,0.06)",
-        }}
-      >
+      <section style={{ background: "#ffffff", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
         <RevealSection>
           <div
             style={{
@@ -318,7 +262,7 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
           >
             {[
               { value: service.deliveryTime, label: "Teslimat Süresi" },
-              { value: service.id === "logo" ? "3+" : `${service.features?.length || 0}`, label: service.id === "logo" ? "Alternatif" : "Özellik" },
+              { value: service.id === "logo" ? "3+" : String(service.features?.length || 0), label: service.id === "logo" ? "Alternatif" : "Özellik" },
               { value: "∞", label: "Revizyon Hakkı" },
             ].map((stat, i) => (
               <motion.div
@@ -329,27 +273,10 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
                 transition={{ duration: 0.8, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 style={{ textAlign: "center" }}
               >
-                <div
-                  style={{
-                    fontSize: "clamp(2rem, 4vw, 3.5rem)",
-                    fontWeight: 300,
-                    color: "#000",
-                    lineHeight: 1,
-                    marginBottom: "8px",
-                    letterSpacing: "-0.02em",
-                  }}
-                >
+                <div style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", fontWeight: 300, color: "#000", lineHeight: 1, marginBottom: "8px", letterSpacing: "-0.02em" }}>
                   {stat.value}
                 </div>
-                <div
-                  style={{
-                    fontSize: "10px",
-                    letterSpacing: "0.2em",
-                    color: "#999",
-                    textTransform: "uppercase",
-                    fontWeight: 400,
-                  }}
-                >
+                <div style={{ fontSize: "10px", letterSpacing: "0.2em", color: "#999", textTransform: "uppercase", fontWeight: 400 }}>
                   {stat.label}
                 </div>
               </motion.div>
@@ -360,13 +287,7 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
 
       {/* ─── FEATURES ─── */}
       <section style={{ background: "#fafaf8", padding: "clamp(80px, 12vh, 160px) 0" }}>
-        <div
-          style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            padding: "0 clamp(24px, 6vw, 80px)",
-          }}
-        >
+        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 clamp(24px, 6vw, 80px)" }}>
           <RevealSection>
             <div style={{ marginBottom: "clamp(48px, 8vh, 96px)" }}>
               <p style={{ fontSize: "10px", letterSpacing: "0.35em", color: "#aaa", textTransform: "uppercase", marginBottom: "16px", fontWeight: 400 }}>
@@ -389,51 +310,15 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
                 whileHover={{ x: 6 }}
               >
                 <div style={{ height: "1px", background: "rgba(0,0,0,0.07)" }} />
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "clamp(20px, 4vw, 56px)",
-                    padding: "clamp(24px, 4vh, 40px) 0",
-                    cursor: "default",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "10px",
-                      fontWeight: 400,
-                      color: "#ccc",
-                      letterSpacing: "0.15em",
-                      flexShrink: 0,
-                      paddingTop: "6px",
-                      minWidth: "28px",
-                    }}
-                  >
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "clamp(20px, 4vw, 56px)", padding: "clamp(24px, 4vh, 40px) 0", cursor: "default" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 400, color: "#ccc", letterSpacing: "0.15em", flexShrink: 0, paddingTop: "6px", minWidth: "28px" }}>
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <div style={{ flex: 1 }}>
-                    <h3
-                      style={{
-                        fontSize: "clamp(18px, 2.5vw, 30px)",
-                        fontWeight: 500,
-                        color: "#000",
-                        margin: "0 0 10px 0",
-                        lineHeight: 1.1,
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
+                    <h3 style={{ fontSize: "clamp(18px, 2.5vw, 30px)", fontWeight: 500, color: "#000", margin: "0 0 10px 0", lineHeight: 1.1, letterSpacing: "-0.01em" }}>
                       {feature.title}
                     </h3>
-                    <p
-                      style={{
-                        fontSize: "clamp(13px, 1.3vw, 15px)",
-                        color: "#777",
-                        lineHeight: 1.7,
-                        margin: 0,
-                        fontWeight: 300,
-                        maxWidth: "560px",
-                      }}
-                    >
+                    <p style={{ fontSize: "clamp(13px, 1.3vw, 15px)", color: "#777", lineHeight: 1.7, margin: 0, fontWeight: 300, maxWidth: "560px" }}>
                       {feature.description}
                     </p>
                   </div>
@@ -445,44 +330,118 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
         </div>
       </section>
 
+      {/* ─── PORTFOLIO ─── */}
+      {service.examples && service.examples.length > 0 && (
+        <section style={{ background: "#000000", padding: "clamp(80px, 12vh, 160px) 0", position: "relative", overflow: "hidden" }}>
+          <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 clamp(24px, 6vw, 80px)" }}>
+            <RevealSection>
+              <div style={{ marginBottom: "clamp(48px, 8vh, 96px)", textAlign: "center" }}>
+                <p style={{ fontSize: "10px", letterSpacing: "0.35em", color: "#444", textTransform: "uppercase", marginBottom: "16px", fontWeight: 400 }}>
+                  Çalışmalar
+                </p>
+                <h2 style={{ fontSize: "clamp(2rem, 4vw, 4rem)", fontWeight: 300, color: "#ffffff", margin: "0 0 16px 0", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+                  Portföy
+                </h2>
+                <p style={{ fontSize: "clamp(13px, 1.4vw, 16px)", color: "rgba(255,255,255,0.35)", fontWeight: 300, maxWidth: "480px", margin: "0 auto" }}>
+                  {service.id === "logo"
+                    ? "Özgün tasarım anlayışımızla hayata geçirdiğimiz logo çalışmaları"
+                    : service.id === "identity"
+                    ? "Tutarlı kurumsal kimlik tasarımlarımız"
+                    : "Modern teknolojiler ile tasarladığımız web siteleri"}
+                </p>
+              </div>
+            </RevealSection>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: service.id === "website"
+                  ? "repeat(auto-fill, minmax(min(100%, 340px), 1fr))"
+                  : "repeat(auto-fill, minmax(min(100%, 240px), 1fr))",
+                gap: "clamp(12px, 2vw, 20px)",
+              }}
+            >
+              {service.examples.map((example, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.94 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, amount: 0.1 }}
+                  transition={{ duration: 0.7, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ scale: 1.02 }}
+                  onClick={() => setSelectedExample(example)}
+                  style={{
+                    position: "relative",
+                    aspectRatio: service.id === "website" ? "4/3" : "1/1",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    background: "#111",
+                    cursor: "pointer",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <Image
+                    src={example || "/placeholder.svg"}
+                    alt={`Portföy ${index + 1}`}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "clamp(24px, 4vw, 64px)",
+                marginTop: "clamp(60px, 10vh, 120px)",
+                paddingTop: "clamp(40px, 6vh, 80px)",
+                borderTop: "1px solid rgba(255,255,255,0.06)",
+              }}
+            >
+              {(service.id === "logo"
+                ? [{ v: "200+", l: "Logo" }, { v: "15+", l: "Sektör" }, { v: "100%", l: "Memnuniyet" }]
+                : service.id === "identity"
+                ? [{ v: "150+", l: "Kurumsal Kimlik" }, { v: "20+", l: "Sektör" }, { v: "100%", l: "Memnuniyet" }]
+                : [{ v: "100+", l: "Web Sitesi" }, { v: "25+", l: "Sektör" }, { v: "99%", l: "Uptime" }]
+              ).map((s, i) => (
+                <div key={i} style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)", fontWeight: 300, color: "#fff", marginBottom: "8px", letterSpacing: "-0.02em" }}>{s.v}</div>
+                  <div style={{ fontSize: "10px", letterSpacing: "0.2em", color: "#555", textTransform: "uppercase" }}>{s.l}</div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* ─── PROCESS ─── */}
-      <section
-        style={{
-          background: "#000000",
-          padding: "clamp(80px, 12vh, 160px) 0",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        {/* Parallax background orb */}
+      <section style={{ background: "#000000", padding: "clamp(80px, 12vh, 160px) 0", position: "relative", overflow: "hidden" }}>
         <motion.div
           style={{
             position: "absolute",
             width: "80vw",
             height: "80vw",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,255,255,0.02) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(255,255,255,0.015) 0%, transparent 70%)",
             left: "50%",
             top: "50%",
             x: "-50%",
             y: "-50%",
             pointerEvents: "none",
           }}
-          animate={{
-            scale: [1, 1.1, 1],
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ scale: [1, 1.08, 1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        <div
-          style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            padding: "0 clamp(24px, 6vw, 80px)",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
+        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 clamp(24px, 6vw, 80px)", position: "relative", zIndex: 1 }}>
           <RevealSection>
             <div style={{ marginBottom: "clamp(48px, 8vh, 96px)" }}>
               <p style={{ fontSize: "10px", letterSpacing: "0.35em", color: "#444", textTransform: "uppercase", marginBottom: "16px", fontWeight: 400 }}>
@@ -507,71 +466,23 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
                 <motion.div
                   whileHover={{ x: 8 }}
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "clamp(24px, 5vw, 80px)",
-                    padding: "clamp(32px, 5vh, 56px) 0",
-                  }}
+                  style={{ display: "flex", alignItems: "flex-start", gap: "clamp(24px, 5vw, 80px)", padding: "clamp(32px, 5vh, 56px) 0" }}
                 >
-                  <span
-                    style={{
-                      fontSize: "clamp(36px, 5vw, 64px)",
-                      fontWeight: 200,
-                      color: "rgba(255,255,255,0.08)",
-                      lineHeight: 1,
-                      flexShrink: 0,
-                      letterSpacing: "-0.02em",
-                      minWidth: "clamp(48px, 7vw, 90px)",
-                    }}
-                  >
+                  <span style={{ fontSize: "clamp(36px, 5vw, 64px)", fontWeight: 200, color: "rgba(255,255,255,0.08)", lineHeight: 1, flexShrink: 0, letterSpacing: "-0.02em", minWidth: "clamp(48px, 7vw, 90px)" }}>
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <div style={{ flex: 1, paddingTop: "6px" }}>
-                    <h3
-                      style={{
-                        fontSize: "clamp(18px, 2.5vw, 30px)",
-                        fontWeight: 400,
-                        color: "#ffffff",
-                        margin: "0 0 12px 0",
-                        lineHeight: 1.2,
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
+                    <h3 style={{ fontSize: "clamp(18px, 2.5vw, 30px)", fontWeight: 400, color: "#ffffff", margin: "0 0 12px 0", lineHeight: 1.2, letterSpacing: "-0.01em" }}>
                       {step.step}
                     </h3>
-                    <p
-                      style={{
-                        fontSize: "clamp(13px, 1.3vw, 15px)",
-                        color: "rgba(255,255,255,0.38)",
-                        lineHeight: 1.8,
-                        margin: 0,
-                        fontWeight: 300,
-                        maxWidth: "520px",
-                      }}
-                    >
+                    <p style={{ fontSize: "clamp(13px, 1.3vw, 15px)", color: "rgba(255,255,255,0.38)", lineHeight: 1.8, margin: 0, fontWeight: 300, maxWidth: "520px" }}>
                       {step.description}
                     </p>
                     {step.step === "Teslim & Rehber" && (
                       <motion.button
-                        whileHover={{ scale: 1.02, borderColor: "rgba(255,255,255,0.25)" }}
+                        whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        style={{
-                          marginTop: "20px",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          background: "transparent",
-                          color: "rgba(255,255,255,0.6)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                          borderRadius: "4px",
-                          padding: "10px 20px",
-                          fontSize: "11px",
-                          fontWeight: 300,
-                          cursor: "pointer",
-                          letterSpacing: "0.1em",
-                          fontFamily: "'Poppins', sans-serif",
-                        }}
+                        style={{ marginTop: "20px", display: "inline-flex", alignItems: "center", gap: "8px", background: "transparent", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "4px", padding: "10px 20px", fontSize: "11px", fontWeight: 300, cursor: "pointer", letterSpacing: "0.1em", fontFamily: "'Poppins', sans-serif" }}
                       >
                         <Download style={{ width: "12px", height: "12px" }} />
                         <span>Örnek Brand Guide PDF</span>
@@ -587,15 +498,8 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
       </section>
 
       {/* ─── CTA ─── */}
-      <section
-        style={{
-          background: "#fafaf8",
-          padding: "clamp(100px, 15vh, 200px) 0",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        {/* Large background text */}
+      <section style={{ background: "#fafaf8", padding: "clamp(100px, 15vh, 200px) 0", position: "relative", overflow: "hidden" }}>
+        {/* Arka plan yazısı: "Merhaba!" */}
         <div
           style={{
             position: "absolute",
@@ -609,7 +513,7 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
         >
           <span
             style={{
-              fontSize: "clamp(80px, 20vw, 240px)",
+              fontSize: "clamp(80px, 22vw, 280px)",
               fontWeight: 700,
               color: "rgba(0,0,0,0.03)",
               letterSpacing: "-0.04em",
@@ -618,98 +522,36 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
               whiteSpace: "nowrap",
             }}
           >
-            Başlayalım
+            Merhaba!
           </span>
         </div>
 
-        <div
-          style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            padding: "0 clamp(24px, 6vw, 80px)",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
+        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 clamp(24px, 6vw, 80px)", position: "relative", zIndex: 1 }}>
           <RevealSection>
             <div style={{ textAlign: "center" }}>
-              <p
-                style={{
-                  fontSize: "10px",
-                  letterSpacing: "0.35em",
-                  color: "#aaa",
-                  textTransform: "uppercase",
-                  marginBottom: "24px",
-                  fontWeight: 400,
-                }}
-              >
+              <p style={{ fontSize: "10px", letterSpacing: "0.35em", color: "#aaa", textTransform: "uppercase", marginBottom: "24px", fontWeight: 400 }}>
                 Projenizi Başlatalım
               </p>
-              <h2
-                style={{
-                  fontSize: "clamp(2.5rem, 6vw, 6rem)",
-                  fontWeight: 300,
-                  color: "#000",
-                  margin: "0 0 32px 0",
-                  lineHeight: 1.05,
-                  letterSpacing: "-0.03em",
-                }}
-              >
+              <h2 style={{ fontSize: "clamp(2.5rem, 6vw, 6rem)", fontWeight: 300, color: "#000", margin: "0 0 32px 0", lineHeight: 1.05, letterSpacing: "-0.03em" }}>
                 Başlayalım
               </h2>
-              <p
-                style={{
-                  fontSize: "clamp(14px, 1.6vw, 18px)",
-                  color: "#888",
-                  fontWeight: 300,
-                  maxWidth: "440px",
-                  lineHeight: 1.7,
-                  margin: "0 auto 48px",
-                }}
-              >
+              <p style={{ fontSize: "clamp(14px, 1.6vw, 18px)", color: "#888", fontWeight: 300, maxWidth: "440px", lineHeight: 1.7, margin: "0 auto 48px" }}>
                 Markanız için özgün tasarım oluşturmak üzere projenizi başlatalım.
               </p>
               <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center" }}>
                 <motion.a
                   href="/iletisim"
-                  whileHover={{ scale: 1.02, backgroundColor: "#111" }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    padding: "16px 40px",
-                    background: "#000",
-                    color: "#fff",
-                    textDecoration: "none",
-                    fontSize: "11px",
-                    fontWeight: 400,
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    borderRadius: "4px",
-                    transition: "background 0.3s ease",
-                  }}
+                  style={{ display: "inline-flex", alignItems: "center", padding: "16px 40px", background: "#000", color: "#fff", textDecoration: "none", fontSize: "11px", fontWeight: 400, letterSpacing: "0.2em", textTransform: "uppercase", borderRadius: "4px" }}
                 >
                   Proje Başlat
                 </motion.a>
                 <motion.a
                   href="/iletisim"
-                  whileHover={{ scale: 1.02, borderColor: "rgba(0,0,0,0.4)" }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    padding: "16px 40px",
-                    background: "transparent",
-                    color: "#000",
-                    textDecoration: "none",
-                    fontSize: "11px",
-                    fontWeight: 400,
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    border: "1px solid rgba(0,0,0,0.15)",
-                    borderRadius: "4px",
-                    transition: "border-color 0.3s ease",
-                  }}
+                  style={{ display: "inline-flex", alignItems: "center", padding: "16px 40px", background: "transparent", color: "#000", textDecoration: "none", fontSize: "11px", fontWeight: 400, letterSpacing: "0.2em", textTransform: "uppercase", border: "1px solid rgba(0,0,0,0.15)", borderRadius: "4px" }}
                 >
                   İletişim
                 </motion.a>
@@ -719,8 +561,144 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
         </div>
       </section>
 
+      {/* ─── HİZMETLER ARASI NAVİGASYON ─── */}
+      <section style={{ background: "#ffffff", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+        <div
+          style={{
+            maxWidth: "1100px",
+            margin: "0 auto",
+            padding: "clamp(32px, 5vh, 56px) clamp(24px, 6vw, 80px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "16px",
+          }}
+        >
+          {/* Önceki hizmet */}
+          {prevService ? (
+            <Link
+              href={`/hizmetler/${prevService.slug}`}
+              style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "12px", color: "#000", flex: 1 }}
+            >
+              <motion.div
+                whileHover={{ x: -4 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
+                <div style={{ width: "36px", height: "36px", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <ChevronLeft style={{ width: "16px", height: "16px", color: "#000" }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: "9px", letterSpacing: "0.2em", color: "#aaa", textTransform: "uppercase", marginBottom: "4px" }}>Önceki</div>
+                  <div style={{ fontSize: "clamp(13px, 1.5vw, 16px)", fontWeight: 500, color: "#000", letterSpacing: "-0.01em" }}>{prevService.title}</div>
+                </div>
+              </motion.div>
+            </Link>
+          ) : (
+            <div style={{ flex: 1 }} />
+          )}
+
+          {/* Orta — tüm hizmetler */}
+          <Link
+            href="/hizmetler"
+            style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", flexShrink: 0 }}
+          >
+            <div style={{ display: "flex", gap: "4px" }}>
+              {SERVICE_NAV.map((s) => (
+                <div
+                  key={s.slug}
+                  style={{
+                    width: "4px",
+                    height: "4px",
+                    borderRadius: "50%",
+                    background: s.slug === service.slug ? "#000" : "rgba(0,0,0,0.15)",
+                    transition: "background 0.3s ease",
+                  }}
+                />
+              ))}
+            </div>
+            <span style={{ fontSize: "9px", letterSpacing: "0.2em", color: "#aaa", textTransform: "uppercase" }}>Tüm Hizmetler</span>
+          </Link>
+
+          {/* Sonraki hizmet */}
+          {nextService ? (
+            <Link
+              href={`/hizmetler/${nextService.slug}`}
+              style={{ textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "12px", color: "#000", flex: 1 }}
+            >
+              <motion.div
+                whileHover={{ x: 4 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: "9px", letterSpacing: "0.2em", color: "#aaa", textTransform: "uppercase", marginBottom: "4px" }}>Sonraki</div>
+                  <div style={{ fontSize: "clamp(13px, 1.5vw, 16px)", fontWeight: 500, color: "#000", letterSpacing: "-0.01em" }}>{nextService.title}</div>
+                </div>
+                <div style={{ width: "36px", height: "36px", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <ChevronRight style={{ width: "16px", height: "16px", color: "#000" }} />
+                </div>
+              </motion.div>
+            </Link>
+          ) : (
+            <div style={{ flex: 1 }} />
+          )}
+        </div>
+      </section>
+
       <Footer />
       <MobileBottomNav />
+
+      {/* Lightbox */}
+      {selectedExample && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setSelectedExample(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.95)",
+            backdropFilter: "blur(8px)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "24px",
+          }}
+        >
+          <div style={{ position: "relative", maxWidth: "90vw", maxHeight: "90vh", width: "100%", height: "100%" }}>
+            <Image
+              src={selectedExample}
+              alt="Portföy detay"
+              fill
+              style={{ objectFit: "contain" }}
+              sizes="90vw"
+            />
+            <button
+              onClick={() => setSelectedExample(null)}
+              style={{
+                position: "absolute",
+                top: "16px",
+                right: "16px",
+                width: "40px",
+                height: "40px",
+                borderRadius: "8px",
+                background: "rgba(255,255,255,0.1)",
+                border: "none",
+                color: "#fff",
+                fontSize: "20px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              ×
+            </button>
+          </div>
+        </motion.div>
+      )}
     </div>
   )
 }
