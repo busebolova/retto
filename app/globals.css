@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    font-family: var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     /* scroll-behavior: smooth — JS ile yönetilsin, layout thrashing önlenir */
   }
 
@@ -23,11 +23,17 @@
   h6 {
     font-weight: 500;
     letter-spacing: -0.02em;
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   }
 
   .font-serif {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     font-style: italic;
     font-weight: 400;
+  }
+
+  * {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   }
 
   /* Mobile optimizations */
@@ -181,22 +187,5 @@
 @media (min-width: 768px) {
   .service-sub {
     display: inline !important;
-  }
-}
-
-/* Founder marquee — GPU-accelerated CSS animasyonu */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-.founder-marquee {
-  animation: marquee 28s linear infinite;
-  will-change: transform;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .founder-marquee {
-    animation: none;
   }
 }

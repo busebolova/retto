@@ -11,7 +11,7 @@ const instagramPosts = [
   // İlk sıra - Sueno projesi
   {
     id: "sueno-web",
-    image: "/images/instagram/sueno-web.jpg", // Blob URL ile değiştirilebilir
+    image: "/images/instagram/sueno-web.jpg",
     caption:
       "Estetik ve strateji, aynı çatı altında! Retto Creative olarak, Sueno'nun marka kimliğini güçlendiren logo & kurumsal kimlik tasarımını ve etkileyici bir web sitesi deneyimini oluşturduk. Mimari vizyonunu en iyi şekilde yansıtmak için modern çizgileri, minimal tasarım anlayışıyla buluşturduk. Şimdi Sueno, güçlü ve profesyonel bir marka olarak dijital dünyada yerini aldı. Bu süreç ile retto döngüsünü başlatmış oldu...",
     likes: 245,
@@ -147,11 +147,11 @@ export default function ManualInstagramFeed() {
                     src={post.image || "/placeholder.svg"}
                     alt={post.caption}
                     fill
-                    sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 300px"
+                    sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    loading="lazy"
                     onError={(e) => {
-                      e.currentTarget.src = "/placeholder.svg"
+                      // Fallback: Placeholder göster
+                      e.currentTarget.src = "/placeholder.svg?height=400&width=400&query=instagram post"
                     }}
                   />
                 </div>

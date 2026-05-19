@@ -5,7 +5,7 @@ import { motion, useInView } from "framer-motion"
 
 export default function ModernFounderSection() {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.15 })
+  const isInView = useInView(ref, { once: false, amount: 0.2 })
   const [isHovered, setIsHovered] = useState(false)
 
   // Creative words that will float
@@ -30,9 +30,9 @@ export default function ModernFounderSection() {
             {/* Left Column - Interactive Image */}
             <motion.div
               className="relative group cursor-pointer order-2 lg:order-1"
-              initial={{ opacity: 0, x: -24 }}
-              animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -24 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
+              initial={{ opacity: 0, x: -50 }}
+              animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+              transition={{ duration: 1, delay: 0.2 }}
               onHoverStart={() => setIsHovered(true)}
               onHoverEnd={() => setIsHovered(false)}
             >
@@ -101,16 +101,16 @@ export default function ModernFounderSection() {
             {/* Right Column - Modern Content */}
             <motion.div
               className="space-y-8 md:space-y-12 order-1 lg:order-2"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 1, delay: 0.4 }}
             >
               {/* Modern Typography - Updated for a more hierarchical look */}
               <motion.div
                 className="relative"
-                initial={{ opacity: 0, y: 16 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
               >
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-extralight tracking-tight leading-tight">
                   <span className="text-black">Az çoktur,</span>
@@ -121,9 +121,9 @@ export default function ModernFounderSection() {
 
               <motion.div
                 className="relative"
-                initial={{ opacity: 0, y: 16 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
               >
                 <p className="text-xl md:text-2xl text-gray-600 font-light leading-relaxed">
                   Her proje, bir hikaye anlatır. Her tasarım, bir duygu yaratır. Biz sadece görsel üretmiyoruz,{" "}
@@ -131,35 +131,56 @@ export default function ModernFounderSection() {
                 </p>
               </motion.div>
 
-              {/* Floating creative words — CSS animasyonu (daha performanslı) */}
-              <div className="relative h-8 overflow-hidden">
-                <div className="founder-marquee flex space-x-8 whitespace-nowrap absolute">
+              {/* Floating creative words */}
+              <div className="relative h-12 overflow-hidden">
+                <motion.div
+                  className="flex space-x-8 whitespace-nowrap absolute"
+                  animate={{
+                    x: [0, -1000],
+                  }}
+                  transition={{
+                    repeat: Number.POSITIVE_INFINITY,
+                    duration: 25,
+                    ease: "linear",
+                  }}
+                >
                   {creativeWords.map((word, index) => (
                     <span key={index} className="text-sm text-gray-400 uppercase tracking-widest font-light">
                       {word}
                     </span>
                   ))}
+                  {/* Duplicate for seamless loop */}
                   {creativeWords.map((word, index) => (
                     <span key={`dup-${index}`} className="text-sm text-gray-400 uppercase tracking-widest font-light">
                       {word}
                     </span>
                   ))}
-                </div>
+                </motion.div>
               </div>
 
               {/* Quote section */}
               <motion.div
                 className="bg-gray-50 rounded-2xl p-6 md:p-8 border-l-4 border-black"
-                initial={{ opacity: 0, x: -12 }}
-                animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -12 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                transition={{ duration: 1, delay: 1.2 }}
               >
                 <blockquote className="text-lg md:text-xl text-gray-700 font-light italic leading-relaxed">
                   "Tasarım sadece nasıl göründüğü değil, nasıl çalıştığıdır. Biz her projede bu ikisini mükemmel şekilde
                   birleştiriyoruz."
                 </blockquote>
                 <div className="flex items-center space-x-4 mt-6">
-                  <div className="w-12 h-[1px] bg-gray-400" />
+                  <motion.div
+                    className="w-12 h-[1px] bg-gray-400"
+                    animate={{
+                      width: [48, 60, 48],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }}
+                  />
                   <cite className="text-gray-500 font-light not-italic">Buse Bolova</cite>
                 </div>
               </motion.div>
@@ -167,9 +188,9 @@ export default function ModernFounderSection() {
               {/* Stats or achievements */}
               <motion.div
                 className="grid grid-cols-3 gap-6"
-                initial={{ opacity: 0, y: 16 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 1, delay: 1.4 }}
               >
                 {[
                   { number: "200+", label: "Proje" },

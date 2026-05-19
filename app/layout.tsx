@@ -1,20 +1,10 @@
 import type React from "react"
 import "./globals.css"
-import { Poppins } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import ScrollToTop from "@/components/scroll-to-top"
 import MobileOptimizedLayout from "@/components/mobile-optimized-layout"
 import { ErrorBoundary } from "@/components/error-boundary"
 import type { Viewport } from "next"
-
-// next/font — render-blocking yok, font-display:swap otomatik, self-hosted
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "600", "700"],
-  display: "swap",
-  preload: true,
-  variable: "--font-poppins",
-})
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -125,17 +115,26 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="tr" suppressHydrationWarning className={poppins.variable}>
+    <html lang="tr" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#000000" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-        {/* DNS prefetch — 3rd party kaynaklar */}
+        {/* Preconnect — render-blocking önlemek için stylesheet'ten önce */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://aifgfzhlyyimravy.public.blob.vercel-storage.com" />
 
-        {/* Kritik görseli preload et */}
-        <link rel="preload" href="/images/retto-logo.png" as="image" fetchPriority="high" />
+        {/* Google Fonts — non-blocking */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"
+        />
+
+        {/* Kritik görselleri preload et */}
+        <link rel="preload" href="/images/retto-logo.png" as="image" />
 
         {/* Structured Data - Organization */}
         <script
@@ -272,7 +271,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`bg-white text-black ${poppins.className}`}>
+      <body className="bg-white text-black">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <ErrorBoundary>
             <MobileOptimizedLayout>

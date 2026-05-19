@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import dynamic from "next/dynamic"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 
-// Three.js sadece masaüstünde yükle
-const ThreeModel = dynamic(() => import("./three-model"), {
-  ssr: false,
-  loading: () => <div style={{ width: "100%", height: "100%" }} />,
-})
+gsap.registerPlugin(ScrollTrigger)
+
+const ThreeModel = dynamic(() => import("./three-model"), { ssr: false })
 
 export default function HeroScrollAnimation() {
   const outerRef = useRef<HTMLDivElement>(null)
@@ -15,11 +15,6 @@ export default function HeroScrollAnimation() {
   const textRef = useRef<HTMLParagraphElement>(null)
   const canvasWrapRef = useRef<HTMLDivElement>(null)
   const bgTextRef = useRef<HTMLDivElement>(null)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768)
-  }, [])
 
   useEffect(() => {
     const outer = outerRef.current
@@ -29,52 +24,43 @@ export default function HeroScrollAnimation() {
 
     if (!outer || !h1 || !textEl || !canvasWrap) return
 
-    // GSAP lazy import — ilk render'ı bloklamaz
-    let cleanup: (() => void) | undefined
-    import("gsap").then(({ gsap }) => {
-      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
-        gsap.registerPlugin(ScrollTrigger)
-
-        const bgText = bgTextRef.current
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: outer,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: isMobile ? 0.5 : 1,
-          }
-        })
-
-        tl.to([h1, canvasWrap], {
-          y: isMobile ? -40 : -80,
-          opacity: 0,
-          duration: 1.2,
-        })
-        .to(bgText, {
-          opacity: 0,
-          duration: 0.6,
-        }, "<0.2")
-        .to(textEl, {
-          opacity: 1,
-          scale: 1,
-          duration: 0.8,
-        })
-
-        cleanup = () => {
-          ScrollTrigger.getAll().forEach((t) => t.kill())
-          tl.kill()
-        }
-      })
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: outer,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1,
+      }
     })
 
-    return () => { if (cleanup) cleanup() }
-  }, [isMobile])
+    const bgText = bgTextRef.current
+
+    tl.to([h1, canvasWrap], {
+      y: -80,
+      opacity: 0,
+      duration: 1.5,
+    })
+    .to(bgText, {
+      opacity: 0,
+      duration: 0.8,
+    }, "<0.3")
+    .to(textEl, {
+      opacity: 1,
+      scale: 1,
+      duration: 1,
+    })
+
+    return () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill())
+      tl.kill()
+    }
+  }, [])
 
   return (
     <div
       ref={outerRef}
       style={{
-        height: isMobile ? "250vh" : "400vh",
+        height: "400vh",
         position: "relative",
       }}
     >
@@ -151,7 +137,7 @@ export default function HeroScrollAnimation() {
           />
         </div>
 
-        {/* 3D model - sadece masaüstünde */}
+        {/* 3D model - tam ortada */}
         <div
           ref={canvasWrapRef}
           style={{
@@ -165,27 +151,7 @@ export default function HeroScrollAnimation() {
             willChange: "transform, opacity",
           }}
         >
-          {!isMobile && <ThreeModel />}
-          {isMobile && (
-            <div style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              <img
-                src="/images/retto-logo.png"
-                alt="Retto Creative"
-                style={{
-                  width: "60%",
-                  height: "auto",
-                  filter: "brightness(0)",
-                  opacity: 0.12,
-                }}
-              />
-            </div>
-          )}
+          <ThreeModel />
         </div>
 
         {/* Scroll sonrası beliren metin */}
