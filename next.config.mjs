@@ -9,6 +9,12 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+
+  // Experimental performance optimizations
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['framer-motion', 'lucide-react', 'three'],
+  },
   
   // Image optimization
   images: {

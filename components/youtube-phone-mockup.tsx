@@ -5,29 +5,41 @@ import { useState, useRef, useEffect } from "react"
 export default function YouTubePhoneMockup() {
   const [isLoading, setIsLoading] = useState(true)
   const [showControls, setShowControls] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
-  // YouTube video ID from the URL
   const videoId = "vF6drrEZ5ZU"
-
-  // YouTube embed URL with autoplay and loop parameters
   const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&playsinline=1&rel=0&showinfo=0&mute=1`
 
+  // Intersection Observer — sadece görünür olunca yükle
   useEffect(() => {
-    // Check if iframe is loaded
-    const handleLoad = () => {
-      setIsLoading(false)
-    }
-
-    const iframe = iframeRef.current
-    if (iframe) {
-      iframe.addEventListener("load", handleLoad)
-      return () => iframe.removeEventListener("load", handleLoad)
-    }
+    const el = containerRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: "200px" }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (!isVisible) return
+    const iframe = iframeRef.current
+    if (!iframe) return
+    const handleLoad = () => setIsLoading(false)
+    iframe.addEventListener("load", handleLoad)
+    return () => iframe.removeEventListener("load", handleLoad)
+  }, [isVisible])
+
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <div className="absolute inset-0 bg-gradient-to-r from-gray-900/30 to-gray-700/20 rounded-[40px] blur-xl group-hover:blur-2xl transition-all duration-500"></div>
       <div className="relative w-full max-w-[300px] md:max-w-[380px] mx-auto">
         {/* Phone Frame */}
@@ -44,23 +56,27 @@ export default function YouTubePhoneMockup() {
             onMouseEnter={() => setShowControls(true)}
             onMouseLeave={() => setShowControls(false)}
           >
-            {/* YouTube iframe */}
-            <iframe
-              ref={iframeRef}
-              src={embedUrl}
-              className="w-full h-full pointer-events-none"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title="Buse Bolova - Retto Creative"
-              style={{ border: "none" }}
-            />
+            {/* YouTube iframe — sadece görünür olunca yükle */}
+            {isVisible ? (
+              <iframe
+                ref={iframeRef}
+                src={embedUrl}
+                className="w-full h-full pointer-events-none"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title="Buse Bolova - Retto Creative"
+                style={{ border: "none" }}
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full bg-black" />
+            )}
 
             {/* Loading indicator */}
-            {isLoading && (
+            {isVisible && isLoading && (
               <div className="absolute inset-0 bg-black flex items-center justify-center">
                 <div className="text-white text-center p-4">
                   <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-sm">Video yükleniyor...</p>
                 </div>
               </div>
             )}

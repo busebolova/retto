@@ -22,16 +22,16 @@ const MobileBottomNav = dynamic(() => import("./components/mobile-bottom-nav"), 
 // Animated section component
 const AnimatedSection = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: false, amount: 0.3 })
+  const isInView = useInView(ref, { once: true, amount: 0.15 })
 
   return (
     <div
       ref={ref}
-      className={`min-h-screen w-full flex items-center justify-center p-4 md:p-8 ${className}`}
+      className={`w-full flex items-center justify-center p-4 md:p-8 ${className}`}
       style={{
         opacity: isInView ? 1 : 0,
-        transform: isInView ? "translateY(0)" : "translateY(50px)",
-        transition: "all 0.9s cubic-bezier(0.17, 0.55, 0.55, 1) 0.2s",
+        transform: isInView ? "translateY(0)" : "translateY(24px)",
+        transition: "opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
       }}
     >
       {children}

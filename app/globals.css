@@ -5,7 +5,7 @@
 @layer base {
   html {
     font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth — JS ile yönetilsin, layout thrashing önlenir */
   }
 
   body {
