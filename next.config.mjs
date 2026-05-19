@@ -12,7 +12,6 @@ const nextConfig = {
 
   // Experimental performance optimizations
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['framer-motion', 'lucide-react', 'three'],
   },
   
