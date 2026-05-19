@@ -147,11 +147,11 @@ export default function ManualInstagramFeed() {
                     src={post.image || "/placeholder.svg"}
                     alt={post.caption}
                     fill
-                    sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
+                    sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 300px"
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
                     onError={(e) => {
-                      // Fallback: Placeholder göster
-                      e.currentTarget.src = "/placeholder.svg?height=400&width=400&query=instagram post"
+                      e.currentTarget.src = "/placeholder.svg"
                     }}
                   />
                 </div>

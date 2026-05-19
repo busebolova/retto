@@ -409,7 +409,8 @@ export default function ServiceDetailPage({ service }: { service: ServiceData })
                     alt={`Portföy ${index + 1}`}
                     fill
                     style={{ objectFit: "cover" }}
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 400px"
+                    loading={index < 3 ? "eager" : "lazy"}
                   />
                 </motion.div>
               ))}
