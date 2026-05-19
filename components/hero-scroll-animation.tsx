@@ -7,7 +7,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const ThreeModel = dynamic(() => import("./three-model"), { ssr: false })
+// Three.js sadece masaüstünde yükle
+const ThreeModel = dynamic(() => import("./three-model"), {
+  ssr: false,
+  loading: () => <div style={{ width: "100%", height: "100%" }} />,
+})
 
 export default function HeroScrollAnimation() {
   const outerRef = useRef<HTMLDivElement>(null)
@@ -142,7 +146,7 @@ export default function HeroScrollAnimation() {
           />
         </div>
 
-        {/* 3D model - tam ortada */}
+        {/* 3D model - sadece masaüstünde */}
         <div
           ref={canvasWrapRef}
           style={{
@@ -156,7 +160,27 @@ export default function HeroScrollAnimation() {
             willChange: "transform, opacity",
           }}
         >
-          <ThreeModel />
+          {!isMobile && <ThreeModel />}
+          {isMobile && (
+            <div style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+              <img
+                src="/images/retto-logo.png"
+                alt="Retto Creative"
+                style={{
+                  width: "60%",
+                  height: "auto",
+                  filter: "brightness(0)",
+                  opacity: 0.12,
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Scroll sonrası beliren metin */}
