@@ -11,7 +11,7 @@ const instagramPosts = [
   // İlk sıra - Sueno projesi
   {
     id: "sueno-web",
-    image: "/images/instagram/sueno-web.jpg",
+    image: "/images/instagram/sueno-web.jpg", // Blob URL ile değiştirilebilir
     caption:
       "Estetik ve strateji, aynı çatı altında! Retto Creative olarak, Sueno'nun marka kimliğini güçlendiren logo & kurumsal kimlik tasarımını ve etkileyici bir web sitesi deneyimini oluşturduk. Mimari vizyonunu en iyi şekilde yansıtmak için modern çizgileri, minimal tasarım anlayışıyla buluşturduk. Şimdi Sueno, güçlü ve profesyonel bir marka olarak dijital dünyada yerini aldı. Bu süreç ile retto döngüsünü başlatmış oldu...",
     likes: 245,
