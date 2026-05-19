@@ -12,45 +12,7 @@ const nextConfig = {
 
   // Experimental performance optimizations
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['framer-motion', 'lucide-react', 'three', 'gsap'],
-  },
-
-  // Webpack bundle splitting
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          three: {
-            test: /[\\/]node_modules[\\/](three)[\\/]/,
-            name: 'three',
-            chunks: 'async',
-            priority: 30,
-          },
-          gsap: {
-            test: /[\\/]node_modules[\\/](gsap)[\\/]/,
-            name: 'gsap',
-            chunks: 'async',
-            priority: 25,
-          },
-          framerMotion: {
-            test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
-            name: 'framer-motion',
-            chunks: 'async',
-            priority: 20,
-          },
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'async',
-            priority: 10,
-            reuseExistingChunk: true,
-          },
-        },
-      }
-    }
-    return config
   },
   
   // Image optimization

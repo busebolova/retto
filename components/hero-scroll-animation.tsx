@@ -2,10 +2,6 @@
 
 import { useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
-import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-
-gsap.registerPlugin(ScrollTrigger)
 
 // Three.js sadece masaüstünde yükle
 const ThreeModel = dynamic(() => import("./three-model"), {
@@ -33,36 +29,45 @@ export default function HeroScrollAnimation() {
 
     if (!outer || !h1 || !textEl || !canvasWrap) return
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: outer,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: isMobile ? 0.5 : 1,
-      }
+    // GSAP lazy import — ilk render'ı bloklamaz
+    let cleanup: (() => void) | undefined
+    import("gsap").then(({ gsap }) => {
+      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger)
+
+        const bgText = bgTextRef.current
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: outer,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: isMobile ? 0.5 : 1,
+          }
+        })
+
+        tl.to([h1, canvasWrap], {
+          y: isMobile ? -40 : -80,
+          opacity: 0,
+          duration: 1.2,
+        })
+        .to(bgText, {
+          opacity: 0,
+          duration: 0.6,
+        }, "<0.2")
+        .to(textEl, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.8,
+        })
+
+        cleanup = () => {
+          ScrollTrigger.getAll().forEach((t) => t.kill())
+          tl.kill()
+        }
+      })
     })
 
-    const bgText = bgTextRef.current
-
-    tl.to([h1, canvasWrap], {
-      y: isMobile ? -40 : -80,
-      opacity: 0,
-      duration: 1.2,
-    })
-    .to(bgText, {
-      opacity: 0,
-      duration: 0.6,
-    }, "<0.2")
-    .to(textEl, {
-      opacity: 1,
-      scale: 1,
-      duration: 0.8,
-    })
-
-    return () => {
-      ScrollTrigger.getAll().forEach((t) => t.kill())
-      tl.kill()
-    }
+    return () => { if (cleanup) cleanup() }
   }, [isMobile])
 
   return (
