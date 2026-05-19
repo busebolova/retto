@@ -189,3 +189,20 @@
     display: inline !important;
   }
 }
+
+/* Founder marquee — GPU-accelerated CSS animasyonu */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.founder-marquee {
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .founder-marquee {
+    animation: none;
+  }
+}

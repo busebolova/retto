@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
@@ -15,6 +15,11 @@ export default function HeroScrollAnimation() {
   const textRef = useRef<HTMLParagraphElement>(null)
   const canvasWrapRef = useRef<HTMLDivElement>(null)
   const bgTextRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+  }, [])
 
   useEffect(() => {
     const outer = outerRef.current
@@ -29,38 +34,38 @@ export default function HeroScrollAnimation() {
         trigger: outer,
         start: "top top",
         end: "bottom bottom",
-        scrub: 1,
+        scrub: isMobile ? 0.5 : 1,
       }
     })
 
     const bgText = bgTextRef.current
 
     tl.to([h1, canvasWrap], {
-      y: -80,
+      y: isMobile ? -40 : -80,
       opacity: 0,
-      duration: 1.5,
+      duration: 1.2,
     })
     .to(bgText, {
       opacity: 0,
-      duration: 0.8,
-    }, "<0.3")
+      duration: 0.6,
+    }, "<0.2")
     .to(textEl, {
       opacity: 1,
       scale: 1,
-      duration: 1,
+      duration: 0.8,
     })
 
     return () => {
       ScrollTrigger.getAll().forEach((t) => t.kill())
       tl.kill()
     }
-  }, [])
+  }, [isMobile])
 
   return (
     <div
       ref={outerRef}
       style={{
-        height: "400vh",
+        height: isMobile ? "250vh" : "400vh",
         position: "relative",
       }}
     >

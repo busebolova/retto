@@ -49,13 +49,15 @@ export default function ThreeModel() {
         antialias: !isMobile,
         alpha: true,
         powerPreference: "high-performance",
+        precision: isMobile ? "mediump" : "highp",
       })
       renderer.setSize(width, height)
-      renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 2))
+      renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2))
       renderer.setClearColor(0x000000, 0)
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = 3.5
+      renderer.toneMappingExposure = isMobile ? 3.0 : 3.5
       renderer.outputColorSpace = THREE.SRGBColorSpace
+      renderer.shadowMap.enabled = false
 
       if (renderer.domElement) {
         renderer.domElement.style.willChange = "transform"
@@ -69,7 +71,7 @@ export default function ThreeModel() {
       scene.environment = envTexture
       pmremGenerator.dispose()
 
-      scene.add(new THREE.AmbientLight(0xffffff, 0.4))
+      scene.add(new THREE.AmbientLight(0xffffff, isMobile ? 0.6 : 0.4))
 
       const keyLight = new THREE.DirectionalLight(0xffffff, 2.5)
       keyLight.position.set(3, 5, 3)
@@ -83,14 +85,15 @@ export default function ThreeModel() {
       rimLight.position.set(0, -2, -4)
       scene.add(rimLight)
 
-      const pointLight1 = new THREE.PointLight(0xff8800, 5.0, 12)
+      // Mobilde sadece 1 point light (3 yerine)
+      const pointLight1 = new THREE.PointLight(0xff8800, isMobile ? 4.0 : 5.0, 12)
       scene.add(pointLight1)
 
-      const pointLight2 = new THREE.PointLight(0x00aaff, 4.0, 12)
-      scene.add(pointLight2)
+      const pointLight2 = isMobile ? null : new THREE.PointLight(0x00aaff, 4.0, 12)
+      if (pointLight2) scene.add(pointLight2)
 
-      const pointLight3 = new THREE.PointLight(0x00ffaa, 2.5, 10)
-      scene.add(pointLight3)
+      const pointLight3 = isMobile ? null : new THREE.PointLight(0x00ffaa, 2.5, 10)
+      if (pointLight3) scene.add(pointLight3)
 
       const loader = new GLTFLoader()
       loader.load(
@@ -155,11 +158,11 @@ export default function ThreeModel() {
         animationId = requestAnimationFrame(animate)
         if (!isVisible) return
 
-        time += isMobile ? 0.006 : 0.008
+        time += isMobile ? 0.005 : 0.008
 
         pointLight1.position.set(Math.sin(time * 0.7) * 4, Math.cos(time * 0.3) * 2, Math.cos(time * 0.7) * 4)
-        pointLight2.position.set(Math.sin(time * 0.5 + Math.PI) * 4, Math.sin(time * 0.4) * 2, Math.cos(time * 0.5 + Math.PI) * 4)
-        pointLight3.position.set(Math.sin(time * 0.3 + Math.PI * 0.5) * 3, Math.cos(time * 0.4) * 3, 2)
+        if (pointLight2) pointLight2.position.set(Math.sin(time * 0.5 + Math.PI) * 4, Math.sin(time * 0.4) * 2, Math.cos(time * 0.5 + Math.PI) * 4)
+        if (pointLight3) pointLight3.position.set(Math.sin(time * 0.3 + Math.PI * 0.5) * 3, Math.cos(time * 0.4) * 3, 2)
 
         current.rotY += (target.rotY - current.rotY) * lerpFactor
         current.rotX += (target.rotX - current.rotX) * lerpFactor
