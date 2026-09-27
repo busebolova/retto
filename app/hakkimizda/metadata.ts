@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Hakkımızda | Retto Creative - Yaratım ve Tasarım Stüdyosu",
+  title: "Hakkımızda - Yaratım ve Tasarım Stüdyosu",
   description:
     "Retto Creative olarak, markaların ruhunu anlayıp dijitalde sanat eserine dönüştürüyoruz. Fikirlerin sanatla buluştuğu yaratım dünyamızı keşfedin.",
   keywords: "hakkımızda, retto creative, dijital ajans izmir, yaratıcı stüdyo, marka tasarımı, web geliştirme ajansı",

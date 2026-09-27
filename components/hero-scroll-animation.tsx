@@ -11,7 +11,7 @@ const ThreeModel = dynamic(() => import("./three-model"), { ssr: false })
 
 export default function HeroScrollAnimation() {
   const outerRef = useRef<HTMLDivElement>(null)
-  const h1Ref = useRef<HTMLHeadingElement>(null)
+  const h1Ref = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLParagraphElement>(null)
   const canvasWrapRef = useRef<HTMLDivElement>(null)
   const bgTextRef = useRef<HTMLDivElement>(null)
@@ -94,7 +94,7 @@ export default function HeroScrollAnimation() {
         />
 
         {/* h1 ref — GSAP animasyonu için gerekli, görünmez */}
-        <h1
+        <div
           ref={h1Ref}
           style={{
             position: "absolute",

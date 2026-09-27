@@ -6,15 +6,6 @@ import { useEffect } from "react"
 
 export default function MobileOptimizedLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // Prevent zoom on input focus (iOS Safari)
-    const viewport = document.querySelector('meta[name="viewport"]')
-    if (viewport) {
-      viewport.setAttribute(
-        "content",
-        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover",
-      )
-    }
-
     // Smooth scrolling for better mobile experience
     document.documentElement.style.scrollBehavior = "smooth"
 
@@ -22,7 +13,7 @@ export default function MobileOptimizedLayout({ children }: { children: React.Re
     document.body.style.overscrollBehavior = "none"
 
     // Optimize touch events
-    document.body.style.touchAction = "pan-y"
+    document.body.style.touchAction = "pan-y pinch-zoom"
 
     return () => {
       document.documentElement.style.scrollBehavior = "auto"

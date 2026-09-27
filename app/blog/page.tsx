@@ -1,17 +1,18 @@
+import { blogPosts } from "@/lib/blog-posts"
 import type { Metadata } from "next"
 import ScrollHeader from "@/components/scroll-header"
 import Link from "next/link"
 import MobileBottomNav from "@/components/mobile-bottom-nav"
 
 export const metadata: Metadata = {
-  title: "Blog | Retto Creative - Tasarım ve Pazarlama İpuçları",
+  title: "Blog - Tasarım ve Pazarlama İpuçları",
   description:
     "Dijital tasarım, marka kimliği, web tasarım ve dijital pazarlama hakkında güncel makaleler ve ipuçları. Uzman görüşleri ve sektör trendleri.",
   keywords: "tasarım blog, dijital pazarlama, marka kimliği, web tasarım, sosyal medya, logo tasarım ipuçları",
   openGraph: {
     title: "Blog | Retto Creative",
     description: "Tasarım ve dijital pazarlama dünyasından güncel içerikler",
-    url: "https://rettocreative.com/blog",
+    url: "https://rettocreative.net/blog",
     siteName: "Retto Creative",
     locale: "tr_TR",
     type: "website",
@@ -22,66 +23,9 @@ export const metadata: Metadata = {
     description: "Tasarım ve dijital pazarlama dünyasından güncel içerikler",
   },
   alternates: {
-    canonical: "https://rettocreative.com/blog",
+    canonical: "https://rettocreative.net/blog",
   },
 }
-
-const blogPosts = [
-  {
-    id: 1,
-    title: "2024'te Logo Tasarımı Trendleri",
-    excerpt: "Bu yıl öne çıkan logo tasarım trendlerini ve markanız için doğru seçimi nasıl yapacağınızı keşfedin.",
-    date: "15 Ocak 2024",
-    category: "Tasarım",
-    readTime: "5 dk",
-    image: "/placeholder.svg?height=300&width=400&text=Logo+Trendleri",
-  },
-  {
-    id: 2,
-    title: "Etkili Sosyal Medya Stratejisi Nasıl Oluşturulur?",
-    excerpt: "Markanızın sosyal medyada başarılı olması için izlemeniz gereken adımlar ve stratejiler.",
-    date: "10 Ocak 2024",
-    category: "Dijital Pazarlama",
-    readTime: "8 dk",
-    image: "/placeholder.svg?height=300&width=400&text=Sosyal+Medya",
-  },
-  {
-    id: 3,
-    title: "Kurumsal Kimlik Tasarımının Önemi",
-    excerpt: "Güçlü bir kurumsal kimliğin işletmenize sağlayacağı avantajlar ve tasarım süreci.",
-    date: "5 Ocak 2024",
-    category: "Marka Kimliği",
-    readTime: "6 dk",
-    image: "/placeholder.svg?height=300&width=400&text=Kurumsal+Kimlik",
-  },
-  {
-    id: 4,
-    title: "Web Tasarımında UX/UI Prensipleri",
-    excerpt: "Kullanıcı deneyimini ön planda tutan web tasarım yaklaşımları ve modern UI trendleri.",
-    date: "28 Aralık 2023",
-    category: "Web Tasarım",
-    readTime: "7 dk",
-    image: "/placeholder.svg?height=300&width=400&text=UX+UI",
-  },
-  {
-    id: 5,
-    title: "Dijital Pazarlamada İçerik Stratejisi",
-    excerpt: "Etkili içerik pazarlama stratejileri ile markanızın dijital varlığını güçlendirin.",
-    date: "20 Aralık 2023",
-    category: "Dijital Pazarlama",
-    readTime: "6 dk",
-    image: "/placeholder.svg?height=300&width=400&text=İçerik+Stratejisi",
-  },
-  {
-    id: 6,
-    title: "Marka Kimliği Oluşturma Rehberi",
-    excerpt: "Güçlü bir marka kimliği oluşturmak için izlemeniz gereken adımlar ve dikkat edilmesi gerekenler.",
-    date: "15 Aralık 2023",
-    category: "Marka Kimliği",
-    readTime: "9 dk",
-    image: "/placeholder.svg?height=300&width=400&text=Marka+Kimliği",
-  },
-]
 
 export default function BlogPage() {
   return (
@@ -150,7 +94,7 @@ export default function BlogPage() {
                       </p>
 
                       <Link
-                        href={`/blog/${post.id}`}
+                        href={`/blog/${post.slug}`}
                         className="inline-flex items-center text-white hover:text-gray-300 text-sm font-medium transition-colors group"
                       >
                         <span>Devamını Oku</span>

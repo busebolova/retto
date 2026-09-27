@@ -1,5 +1,6 @@
 "use client"
 
+import AgencyIntroduction from "./components/agency-introduction"
 import { useRef } from "react"
 import React from "react"
 import { useInView } from "framer-motion"
@@ -13,10 +14,10 @@ import PreloadCriticalImages from "./components/preload-critical-images"
 const Preloader = dynamic(() => import("./components/preloader"), { ssr: false })
 const HeroScrollAnimation = dynamic(() => import("./components/hero-scroll-animation"), { ssr: false })
 const YouTubePhoneMockup = dynamic(() => import("./components/youtube-phone-mockup"), { ssr: false })
-const ModernServicesGrid = dynamic(() => import("./components/modern-services-grid"), { ssr: false })
-const ModernFounderSection = dynamic(() => import("./components/modern-founder-section"), { ssr: false })
+const ModernServicesGrid = dynamic(() => import("./components/modern-services-grid"))
+const ModernFounderSection = dynamic(() => import("./components/modern-founder-section"))
 const ManualInstagramFeed = dynamic(() => import("./components/manual-instagram-feed"), { ssr: false })
-const Footer = dynamic(() => import("./components/footer"), { ssr: false })
+const Footer = dynamic(() => import("./components/footer"))
 const MobileBottomNav = dynamic(() => import("./components/mobile-bottom-nav"), { ssr: false })
 
 // Animated section component
@@ -57,6 +58,8 @@ export default function ScrollablePage() {
       <div style={{ position: "relative", zIndex: 10 }}>
         <HeroScrollAnimation />
       </div>
+
+      <AgencyIntroduction />
 
       {/* About Us - Story Section */}
       <AnimatedSection className="bg-white text-black">

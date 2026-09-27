@@ -2,17 +2,17 @@ import type { Metadata } from "next"
 import IletisimClient from "./iletisim-client"
 
 export const metadata: Metadata = {
-  title: "İletişim | Retto Creative - Bize Ulaşın",
+  title: "İletişim - Bize Ulaşın",
   description:
     "Retto Creative ile iletişime geçin. WhatsApp üzerinden direkt iletişim veya iletişim formunu kullanarak projenizi başlatın. Telefon: 0530 833 01 37",
   keywords: "iletişim, İzmir reklam ajansı, proje başlat, whatsapp, destek",
   alternates: {
-    canonical: "https://rettocreative.com/iletisim",
+    canonical: "https://rettocreative.net/iletisim",
   },
   openGraph: {
     title: "İletişim | Retto Creative",
     description: "Markanızın dijital dönüşümü için bizimle iletişime geçin",
-    url: "https://rettocreative.com/iletisim",
+    url: "https://rettocreative.net/iletisim",
     type: "website",
     locale: "tr_TR",
     images: [
