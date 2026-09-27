@@ -218,4 +218,3 @@ export const projectsData = {
     designPrinciples: ["Premium Positioning", "Minimal Zarafet", "Geometrik Harmony", "Lüks Deneyim", "Zanaat Vurgusu"],
   },
 }
-
