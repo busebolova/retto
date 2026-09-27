@@ -1,9 +1,7 @@
+import { pageMetadata } from "@/lib/seo"
 import BlobGallery from "@/components/blob-gallery"
 
-export const metadata = {
-  title: "Görsel Galerisi | Retto",
-  description: "Retto tarafından oluşturulan görsel galerisi",
-}
+export const metadata = pageMetadata("Görsel Galerisi", "Retto Creative tasarım çalışmalarından görseller.", "/galeri")
 
 export default function GalleryPage() {
   return (

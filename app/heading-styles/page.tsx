@@ -1,3 +1,5 @@
+export const metadata = { robots: { index: false, follow: true } }
+
 import HeadingShowcase from "@/components/heading-showcase"
 
 export default function HeadingStylesPage() {

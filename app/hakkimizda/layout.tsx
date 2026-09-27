@@ -2,17 +2,17 @@ import type React from "react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Hakkımızda | Retto Creative - İzmir Reklam Ajansı",
+  title: "Hakkımızda - İzmir Reklam Ajansı",
   description:
     "Retto Creative hakkında bilgi edinin. Buse Bolova tarafından kurulmuş, minimal estetik anlayışıyla markaların dijital kimliklerini tasarlayan İzmir reklam ajansı.",
   keywords: "retto creative, buse bolova, reklam ajansı, marka tasarımı, dijital pazarlama",
   alternates: {
-    canonical: "https://rettocreative.com/hakkimizda",
+    canonical: "https://rettocreative.net/hakkimizda",
   },
   openGraph: {
     title: "Hakkımızda | Retto Creative",
     description: "Minimal estetik anlayışıyla markaların dijital kimliklerini şekillendiriyoruz",
-    url: "https://rettocreative.com/hakkimizda",
+    url: "https://rettocreative.net/hakkimizda",
     type: "website",
     locale: "tr_TR",
     images: [

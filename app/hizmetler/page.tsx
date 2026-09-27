@@ -5,7 +5,7 @@ import Footer from "@/components/footer"
 import MobileBottomNav from "@/components/mobile-bottom-nav"
 
 export const metadata: Metadata = {
-  title: "Neler Yapıyoruz? | Retto Creative - Tasarım & Pazarlama Hizmetleri",
+  title: "Neler Yapıyoruz? - Tasarım & Pazarlama Hizmetleri",
   description:
     "Logo tasarımı, kurumsal kimlik, web sitesi, sosyal medya yönetimi, marka tescil ve video prodüksiyon hizmetleri. İzmir'de profesyonel yaratıcı çözümler. ☎️ 0530 833 01 37",
   keywords: [
@@ -20,12 +20,12 @@ export const metadata: Metadata = {
     "reklam ajansı",
   ],
   alternates: {
-    canonical: "https://rettocreative.com/hizmetler",
+    canonical: "https://rettocreative.net/hizmetler",
   },
   openGraph: {
     title: "Neler Yapıyoruz? | Retto Creative",
     description: "Logo tasarımı, kurumsal kimlik, web sitesi, sosyal medya ve daha fazlası. İzmir'in yaratıcı ajansı.",
-    url: "https://rettocreative.com/hizmetler",
+    url: "https://rettocreative.net/hizmetler",
     type: "website",
     locale: "tr_TR",
     siteName: "Retto Creative",

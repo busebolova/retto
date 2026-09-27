@@ -1,3 +1,4 @@
+import { SITE_URL, jsonLd } from "@/lib/seo"
 import type React from "react"
 import "./globals.css"
 import { Poppins } from "next/font/google"
@@ -5,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import ScrollToTop from "@/components/scroll-to-top"
 import MobileOptimizedLayout from "@/components/mobile-optimized-layout"
 import { ErrorBoundary } from "@/components/error-boundary"
-import type { Viewport } from "next"
+import type { Metadata, Viewport } from "next"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -19,14 +20,12 @@ const poppins = Poppins({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
   themeColor: "#000000",
 }
 
-export const metadata = {
-  metadataBase: new URL("https://rettocreative.com"),
+export const metadata: Metadata = {
+  metadataBase: new URL("https://rettocreative.net"),
   title: {
     default: "Retto Creative | İzmir Reklam & Tasarım Ajansı",
     template: "%s | Retto Creative",
@@ -49,7 +48,7 @@ export const metadata = {
     "marka kimliği",
     "video prodüksiyon izmir",
   ],
-  authors: [{ name: "Retto Creative", url: "https://rettocreative.com" }],
+  authors: [{ name: "Retto Creative", url: "https://rettocreative.net" }],
   creator: "Retto Creative",
   publisher: "Retto Creative",
   category: "Reklam & Tasarım",
@@ -79,7 +78,7 @@ export const metadata = {
     title: "Retto Creative | İzmir Reklam & Tasarım Ajansı",
     description:
       "İzmir merkezli yaratıcı reklam ajansı. Logo tasarımı, kurumsal kimlik, web sitesi ve dijital pazarlama çözümleri. ☎️ 0530 833 01 37",
-    url: "https://rettocreative.com",
+    url: "https://rettocreative.net",
     siteName: "Retto Creative",
     locale: "tr_TR",
     type: "website",
@@ -102,21 +101,10 @@ export const metadata = {
     creator: "@rettocreative",
     site: "@rettocreative",
   },
-  alternates: {
-    canonical: "https://rettocreative.com",
-    languages: {
-      "tr-TR": "https://rettocreative.com",
-    },
-  },
-  verification: {
-    google: "YOUR_GOOGLE_VERIFICATION_CODE",
-  },
-  other: {
-    "geo.region": "TR-35",
-    "geo.placename": "İzmir",
-    "geo.position": "38.4192;27.1287",
-    "ICBM": "38.4192, 27.1287",
-  },
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
+
 }
 
 export default function RootLayout({
@@ -133,140 +121,26 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://aifgfzhlyyimravy.public.blob.vercel-storage.com" />
         <link rel="preload" href="/images/retto-logo.png" as="image" />
 
-        {/* Structured Data - Organization */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "@id": "https://rettocreative.com/#organization",
-              name: "Retto Creative",
-              description:
-                "İzmir'in önde gelen dijital reklam ajansı. Logo tasarımı, kurumsal kimlik, web sitesi ve dijital pazarlama hizmetleri.",
-              url: "https://rettocreative.com",
-              logo: {
-                "@type": "ImageObject",
-                url: "https://rettocreative.com/images/retto-logo.png",
-                width: 500,
-                height: 500,
-              },
-              image: "https://rettocreative.com/images/retto-logo.png",
-              contactPoint: {
-                "@type": "ContactPoint",
-                telephone: "+90-530-833-01-37",
-                contactType: "Customer Service",
-                areaServed: "TR",
-                availableLanguage: "Turkish",
-                email: "hello@rettocreative.net",
-              },
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "İzmir",
-                addressCountry: "TR",
-                addressRegion: "İzmir",
-              },
-              sameAs: ["https://www.instagram.com/rettocreative/", "https://wa.me/905308330137"],
-              areaServed: {
-                "@type": "GeoShape",
-                addressCountry: "TR",
-              },
-              priceRange: "$$",
-              knowsAbout: [
-                "Logo Tasarımı",
-                "Kurumsal Kimlik",
-                "Web Sitesi Tasarımı",
-                "Sosyal Medya Yönetimi",
-                "Dijital Pazarlama",
-                "Marka Tescil",
-                "Video Prodüksiyon",
-              ],
-              serviceArea: {
-                "@type": "GeoCircle",
-                geoMidpoint: {
-                  "@type": "GeoCoordinates",
-                  latitude: 38.4192,
-                  longitude: 27.1287,
-                },
-                geoRadius: "50000",
-              },
-            }),
-          }}
-        />
-
-        {/* Structured Data - Local Business */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              "@id": "https://rettocreative.com/#localbusiness",
-              name: "Retto Creative",
-              image: "https://rettocreative.com/images/retto-logo.png",
-              telephone: "+90-530-833-01-37",
-              email: "hello@rettocreative.net",
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "İzmir",
-                addressCountry: "TR",
-                addressRegion: "İzmir",
-              },
-              geo: {
-                "@type": "GeoCoordinates",
-                latitude: 38.4192,
-                longitude: 27.1287,
-              },
-              url: "https://rettocreative.com",
-              priceRange: "$$",
-              aggregateRating: {
-                "@type": "AggregateRating",
-                ratingValue: "5",
-                reviewCount: "100",
-              },
-            }),
-          }}
-        />
-
-        {/* Structured Data - WebSite (for search actions) */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              url: "https://rettocreative.com",
-              name: "Retto Creative",
-              potentialAction: {
-                "@type": "SearchAction",
-                target: {
-                  "@type": "EntryPoint",
-                  urlTemplate: "https://rettocreative.com/search?q={search_term_string}",
-                },
-                "query-input": "required name=search_term_string",
-              },
-            }),
-          }}
-        />
-
-        {/* Structured Data - BreadcrumbList (for homepage) */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                {
-                  "@type": "ListItem",
-                  position: 1,
-                  name: "Anasayfa",
-                  item: "https://rettocreative.com",
-                },
-              ],
-            }),
-          }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization", "@id": SITE_URL + "/#organization",
+              name: "Retto Creative", url: SITE_URL,
+              description: "İzmir merkezli web sitesi, logo tasarımı ve kurumsal kimlik ajansı.",
+              logo: SITE_URL + "/images/retto-logo.png",
+              telephone: "+90-530-833-01-37", email: "hello@rettocreative.net",
+              address: { "@type": "PostalAddress", addressLocality: "İzmir", addressCountry: "TR" },
+              sameAs: ["https://www.instagram.com/rettocreative/"],
+              knowsAbout: ["Web sitesi tasarımı", "Logo tasarımı", "Kurumsal kimlik"],
+            },
+            {
+              "@type": "WebSite", "@id": SITE_URL + "/#website",
+              name: "Retto Creative", url: SITE_URL, inLanguage: "tr-TR",
+              publisher: { "@id": SITE_URL + "/#organization" },
+            },
+          ],
+        }) }} />
       </head>
       <body className={`bg-white text-black ${poppins.className}`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
